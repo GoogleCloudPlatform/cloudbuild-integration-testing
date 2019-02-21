@@ -1,0 +1,63 @@
+steps:
+- id: 'build web container'
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--tag=web', # use local registry for compatibility with local builds
+    '--tag=gcr.io/$PROJECT_ID/web',
+    '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
+    'web/.',
+  ]
+
+- id: 'build database container'
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--tag=mysql', # use local registry for compatibility with local builds
+    '--tag=gcr.io/$PROJECT_ID/mysql',
+    '--cache-from', 'gcr.io/$PROJECT_ID/mysql:latest',
+    'mysql/.',
+  ]
+  env:
+  - "MYSQL_ROOT_PASSWORD=password"
+
+- id: 'Push web image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/web']
+
+- id: 'Push database image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/mysql']
+    
+- id: 'Deploy application to cluster'
+  name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+    gcloud container clusters get-credentials --zone=us-west1-a staging;     
+    kubectl apply -f k8s/; 
+
+- id: 'Get endpoint of web service'
+  name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+    gcloud container clusters get-credentials --zone=us-west1-a staging;     
+    apt-get update;
+    apt-get -y install jq;
+    jq --version;
+    kubectl get services cookieshop-web -o=json | 
+      jq .status.loadBalancer.ingress[0].ip -r > _endpoint;
+
+- id: 'run E2E tests'
+  name: 'gcr.io/cloud-builders/curl'
+  entrypoint: '/bin/bash'
+  args: 
+  - '-c'
+  - |
+    cat _endpoint;
+    ### -r = retries; -i = interval; -k = keyword to search for ###
+    ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _endpoint):3000
+    ./test/test-content.sh -r 20 -i 3 -u http://$(cat _endpoint):3000 -k 'Chocolate Chip'

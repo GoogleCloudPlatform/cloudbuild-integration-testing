@@ -63,14 +63,9 @@ echo "Was looking for '$keyword'; not found in:"
 echo "$html"
 echo "END CONTENT TEST: Fail! 💩"
 
-# publish logs of failed test
-docker-compose logs --no-color --tail=1000 web > content-test-web.txt
-docker-compose logs --no-color --tail=1000 database > content-test-database.txt
-# echo "~~~~~~~~~~ BEGIN docker-compose logs ~~~~~~~~~~~~~~~"
-# echo "------------------ container 'web' -----------------"
-# cat web.txt
-# echo "------------- container 'database' -----------------"
-# cat database.txt
-# echo "~~~~~~~~~~~ END docker-compose logs ~~~~~~~~~~~~~~~~"
+docker-compose logs --no-color --tail=1000 web > test/logs/content-test-web.txt
+docker-compose logs --no-color --tail=1000 database > test/logs/content-test-database.txt
+
+# If desired, cat the logs or copy to GCS
 
 exit 1
