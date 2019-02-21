@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1= title
+  h3 Welcome to the #{location} location of #{title}
+  each product in products
+    p We've got #{product.name}!
