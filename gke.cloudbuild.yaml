@@ -29,14 +29,13 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/mysql']
     
+- id: 'Create namespace'
+  name: 'gcr.io/cloud-builders/kubectl'
+  args: ['create','namespace','$BUILD_ID']
+
 - id: 'Deploy application to cluster'
   name: 'gcr.io/cloud-builders/kubectl'
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-    gcloud container clusters get-credentials --zone=us-west1-a staging;     
-    kubectl apply -f k8s/; 
+  args: ['apply', '-f', 'k8s/', '--namespace=$BUILD_ID'] 
 
 - id: 'Get endpoint of web service'
   name: 'gcr.io/cloud-builders/kubectl'
@@ -44,11 +43,10 @@ steps:
   args: 
   - '-c'
   - |
-    gcloud container clusters get-credentials --zone=us-west1-a staging;     
     apt-get update;
     apt-get -y install jq;
     jq --version;
-    kubectl get services cookieshop-web -o=json | 
+    kubectl get services cookieshop-web --namespace=$BUILD_ID -o=json | 
       jq .status.loadBalancer.ingress[0].ip -r > _endpoint;
 
 - id: 'run E2E tests'
@@ -61,3 +59,12 @@ steps:
     ### -r = retries; -i = interval; -k = keyword to search for ###
     ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _endpoint):3000
     ./test/test-content.sh -r 20 -i 3 -u http://$(cat _endpoint):3000 -k 'Chocolate Chip'
+
+- id: 'Delete namespace'
+  name: 'gcr.io/cloud-builders/kubectl'
+  args: ['delete', 'namespaces', '$BUILD_ID']
+
+options:
+  env:
+    - CLOUDSDK_COMPUTE_ZONE=us-west1-a
+    - CLOUDSDK_CONTAINER_CLUSTER=staging
