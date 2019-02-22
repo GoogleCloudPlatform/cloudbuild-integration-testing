@@ -43,11 +43,8 @@ steps:
   args: 
   - '-c'
   - |
-    apt-get update;
-    apt-get -y install jq;
-    jq --version;
-    kubectl get services cookieshop-web --namespace=$BUILD_ID -o=json | 
-      jq .status.loadBalancer.ingress[0].ip -r > _endpoint;
+      sleep 60;
+      kubectl get service cookieshop-web -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' > _endpoint
 
 - id: 'run E2E tests'
   name: 'gcr.io/cloud-builders/curl'
