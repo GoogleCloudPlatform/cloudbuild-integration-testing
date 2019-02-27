@@ -3,7 +3,7 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
-    '--tag=web', # use local registry for compatibility with local builds
+    '--tag=web', 
     '--tag=gcr.io/$PROJECT_ID/web',
     '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
     'web/.',
@@ -13,7 +13,7 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
-    '--tag=mysql', # use local registry for compatibility with local builds
+    '--tag=mysql',
     '--tag=gcr.io/$PROJECT_ID/mysql',
     '--cache-from', 'gcr.io/$PROJECT_ID/mysql:latest',
     'mysql/.',
@@ -43,8 +43,16 @@ steps:
   args: 
   - '-c'
   - |
-      sleep 60;
-      kubectl get service cookieshop-web -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' > _endpoint
+    get_ip() {
+      kubectl get service cookieshop-web -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
+    }
+
+    until [[ -n "$(get_ip)" ]]; do
+        echo "waiting for ip"
+        sleep 3
+    done
+
+    echo "$(get_ip)" > _endpoint
 
 - id: 'run E2E tests'
   name: 'gcr.io/cloud-builders/curl'
