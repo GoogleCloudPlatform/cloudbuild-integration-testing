@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: gcr.io/euphoric-coast-216716/web:latest
+        image: gcr.io/gcb-sandbox/web:latest
         env:
         - name: DB_HOST
           value: cookieshop-db

@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: gcr.io/euphoric-coast-216716/mysql:latest
+        image: gcr.io/gcb-sandbox/mysql:latest
         env:
           - name: MYSQL_ROOT_PASSWORD
             value: "password"
