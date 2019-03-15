@@ -31,11 +31,11 @@ steps:
     
 - id: 'Create namespace'
   name: 'gcr.io/cloud-builders/kubectl'
-  args: ['create','namespace','$BUILD_ID']
+  args: ['create','namespace','test-$BUILD_ID']
 
 - id: 'Deploy application to cluster'
   name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/', '--namespace=$BUILD_ID'] 
+  args: ['apply', '-f', 'k8s/', '--namespace=test-$BUILD_ID'] 
 
 - id: 'Get endpoint of web service'
   name: 'gcr.io/cloud-builders/kubectl'
@@ -44,7 +44,7 @@ steps:
   - '-c'
   - |
     get_ip() {
-      kubectl get service cookieshop-web --namespace=$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
+      kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
     }
 
     until [[ -n "$(get_ip)" ]]; do
@@ -67,7 +67,7 @@ steps:
 
 - id: 'Delete namespace'
   name: 'gcr.io/cloud-builders/kubectl'
-  args: ['delete', 'namespaces', '$BUILD_ID']
+  args: ['delete', 'namespaces', 'test-$BUILD_ID']
 
 options:
   env:
