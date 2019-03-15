@@ -12,7 +12,7 @@ Run command:
 Prerequisites:
 
 0. A running kubernetes cluster (this example uses GKE)
-- `gcloud container clusters create staging --zone us-west1-a` 
+- `gcloud container clusters create staging --zone us-central1-c` 
 0. Cloud Build service account must have role: "Kubernetes Engine Developer"
 - TODO: add service account gcloud command
 Run command:
