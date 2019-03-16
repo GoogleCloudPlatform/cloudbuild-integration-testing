@@ -9,7 +9,7 @@ resource "google_compute_instance" "default" {
   machine_type = "n1-standard-1"
   zone         = "us-central1-c"
 
-  tags = ["allow-8080", "allow-3000"]
+  tags = ["allow-8080", "allow-3000", "allow-k8s-nodeports"]
 
   boot_disk {
     initialize_params {
@@ -25,11 +25,16 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  // program instance for self-deletion
+  // startup script:
+  // 1. install microk8s
+  // 2. program instance for self-deletion
   // use heredoc format b/c terraform doesn't support multi-line strings
-  // TODO: consider moving this to a provider instead
   metadata = {
     startup-script = <<-SCRIPT
+    sudo snap install microk8s --classic 
+    microk8s.status --wait-ready --timeout=180
+    microk8s.enable dns
+    microk8s.status --wait-ready --timeout=180
     echo "gcloud compute instances delete $(hostname) --zone $(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/zone -s | cut -d/ -f4) -q" | at Now + ${var.self-destruct-timeout-minutes} Minutes
     SCRIPT
   }

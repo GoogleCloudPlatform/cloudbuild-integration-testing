@@ -36,10 +36,10 @@ metadata:
     app: cookieshop
     role: web
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 3000
-    targetPort: 3000
+    nodePort: 30000
   selector:
     role: web
     app: cookieshop

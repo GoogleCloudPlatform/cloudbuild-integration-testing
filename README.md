@@ -22,17 +22,22 @@ Run command:
 
 ### to do things locally:
 ```
-# run terraform to create a self-destructing VM (TODO: add microk8s install to tf)
+# run terraform to create a self-destructing VM w/ microk8s
 terraform apply -var="project-name=$(gcloud config get-value project 2> /dev/null)" -var="instance-name=test-$(date +%s)" -auto-approve
 
 # get the IP from terraform
-echo $(terraform output ip) > _microk8s_ip
+echo $(terraform output ip) > .tmp.microk8s_ip
 
 # patch the IP into the kubectl config
-[TODO (sed)]
+# (backup flag is passed for macOS compatibility)
+# TODO: use a better regex so this can work repeatedly instead of just once
+sed -i.sed-bak "s/CLUSTER_IP/$(< .tmp.microk8s_ip)/" kubeconfig.microk8s
 
 # kubectl can now deploy to microk8s
-kubectl apply -f ./k8s
+kubectl apply -f ./k8s --kubeconfig=kubeconfig.microk8s
+
+# see services
+kubectl get services --kubeconfig=kubeconfig.microk8s
 ```
 
 

@@ -140,3 +140,7 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+
+# omit individual lil' temp files
+.tmp.*
+*.sed-bak
