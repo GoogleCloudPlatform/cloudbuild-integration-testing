@@ -5,7 +5,8 @@ provider "google" {
 
 // Create a new instance
 resource "google_compute_instance" "default" {
-  name         = "${var.instance-name}"
+  // strip underscores from provided name b/c GCE doesn't like them
+  name         = "${replace(var.instance-name,"_","")}"
   machine_type = "n1-standard-1"
   zone         = "us-central1-c"
 

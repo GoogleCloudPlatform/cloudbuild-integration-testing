@@ -41,7 +41,7 @@ echo "url: "$url
 
 for i in $(seq 0 $retries); do
     
-    status="$(curl -sL -w "%{http_code}" -I "$url" -o /dev/null)"
+    status="$(curl -sL -w "%{http_code}" -I "$url" -o /dev/null)" || status='000'
     
     if [[ $status == '200' ]]
     then

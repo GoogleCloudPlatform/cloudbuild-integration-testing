@@ -40,7 +40,11 @@ kubectl apply -f ./k8s --kubeconfig=kubeconfig.microk8s
 kubectl get services --kubeconfig=kubeconfig.microk8s
 ```
 
-
+### to do things in Cloud Build:
+(prerequisite: terraform builder is built and pushed to GCR in project)
+```
+gcloud builds submit --config=vm.cloudbuild.yaml .
+```
 
 
 
