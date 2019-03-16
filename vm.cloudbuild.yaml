@@ -1,0 +1,82 @@
+steps:
+
+- name: terraform
+  TODO
+
+# UNCOMMENT below after getting the VM going
+
+# - id: 'build web container'
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: [
+#     'build',
+#     '--tag=web', 
+#     '--tag=gcr.io/$PROJECT_ID/web',
+#     '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
+#     'web/.',
+#   ]
+
+# - id: 'build database container'
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: [
+#     'build',
+#     '--tag=mysql',
+#     '--tag=gcr.io/$PROJECT_ID/mysql',
+#     '--cache-from', 'gcr.io/$PROJECT_ID/mysql:latest',
+#     'mysql/.',
+#   ]
+#   env:
+#   - "MYSQL_ROOT_PASSWORD=password"
+
+# - id: 'Push web image'
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: ['push', 'gcr.io/$PROJECT_ID/web']
+
+# - id: 'Push database image'
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: ['push', 'gcr.io/$PROJECT_ID/mysql']
+    
+# - id: 'Create namespace'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['create','namespace','$BUILD_ID']
+
+# - id: 'Deploy application to cluster'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['apply', '-f', 'k8s/', '--namespace=$BUILD_ID'] 
+
+# - id: 'Get endpoint of web service'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   entrypoint: 'bash'
+#   args: 
+#   - '-c'
+#   - |
+#     get_ip() {
+#       kubectl get service cookieshop-web --namespace=$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
+#     }
+
+#     until [[ -n "$(get_ip)" ]]; do
+#         echo "waiting for ip"
+#         sleep 3
+#     done
+
+#     echo "$(get_ip)" > _endpoint
+
+# - id: 'run E2E tests'
+#   name: 'gcr.io/cloud-builders/curl'
+#   entrypoint: '/bin/bash'
+#   args: 
+#   - '-c'
+#   - |
+#     cat _endpoint;
+#     ### -r = retries; -i = interval; -k = keyword to search for ###
+#     ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _endpoint):3000
+#     ./test/test-content.sh -r 20 -i 3 -u http://$(cat _endpoint):3000 -k 'Chocolate Chip'
+
+# - id: 'Delete namespace'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['delete', 'namespaces', '$BUILD_ID']
+
+# options:
+#   env:
+#     # location/name of GKE cluster (used by all kubectl commands)
+#     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
+#     - CLOUDSDK_CONTAINER_CLUSTER=staging
