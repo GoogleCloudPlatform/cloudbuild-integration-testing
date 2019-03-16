@@ -20,6 +20,11 @@ Run command:
 
 ## Method 3: deploy to self-destructing VM [TODO]
 
+### to run terraform locally:
+```
+tf apply -var="project-name=$(gcloud config get-value project 2> /dev/null)" -var="instance-name=test-$(date +%s)" -auto-approve
+```
+
 
 
 

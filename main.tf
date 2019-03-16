@@ -5,7 +5,7 @@ provider "google" {
 
 // Create a new instance
 resource "google_compute_instance" "default" {
-  name         = "test-${uuid()}"
+  name         = "${var.instance-name}"
   machine_type = "n1-standard-1"
   zone         = "us-central1-c"
 
@@ -25,20 +25,32 @@ resource "google_compute_instance" "default" {
     network = "default"
 
     access_config {
-      // Ephemeral IP
-
+      // An Ephemeral IP will be assigned
     }
   }
 
-//  metadata = {
-//    foo = "bar"
-//  }
+  // program instance for self-deletion
+  // use heredoc format b/c terraform doesn't support multi-line strings
+  metadata = {
+    startup-script = <<-SCRIPT
+    echo "gcloud compute instances delete $(hostname) --zone $(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/zone -s | cut -d/ -f4) -q" | at Now + ${var.self-destruct-timeout-minutes} Minutes
+    SCRIPT
+  }
 
-  metadata_startup_script = "echo hi"
-
-//  service_account {
-//    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
-//  }
+  service_account {
+    scopes = [
+      // default GCE scopes
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write",
+      "https://www.googleapis.com/auth/pubsub",
+      "https://www.googleapis.com/auth/service.management.readonly",
+      "https://www.googleapis.com/auth/servicecontrol",
+      "https://www.googleapis.com/auth/trace.append",
+      // grant permission to compute API so this instance can delete itself
+      "https://www.googleapis.com/auth/compute",
+      ]
+  }
 
 }
 
