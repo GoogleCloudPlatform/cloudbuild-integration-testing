@@ -9,17 +9,13 @@ resource "google_compute_instance" "default" {
   machine_type = "n1-standard-1"
   zone         = "us-central1-c"
 
-  tags = ["http-server", "https-server"]
+  tags = ["allow-8080", "allow-3000"]
 
   boot_disk {
     initialize_params {
       image = "ubuntu-1804-lts"
     }
   }
-
-  // Local SSD disk
-//  scratch_disk {
-//  }
 
   network_interface {
     network = "default"
@@ -31,6 +27,7 @@ resource "google_compute_instance" "default" {
 
   // program instance for self-deletion
   // use heredoc format b/c terraform doesn't support multi-line strings
+  // TODO: consider moving this to a provider instead
   metadata = {
     startup-script = <<-SCRIPT
     echo "gcloud compute instances delete $(hostname) --zone $(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/zone -s | cut -d/ -f4) -q" | at Now + ${var.self-destruct-timeout-minutes} Minutes

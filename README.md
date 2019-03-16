@@ -20,9 +20,19 @@ Run command:
 
 ## Method 3: deploy to self-destructing VM [TODO]
 
-### to run terraform locally:
+### to do things locally:
 ```
-tf apply -var="project-name=$(gcloud config get-value project 2> /dev/null)" -var="instance-name=test-$(date +%s)" -auto-approve
+# run terraform to create a self-destructing VM (TODO: add microk8s install to tf)
+terraform apply -var="project-name=$(gcloud config get-value project 2> /dev/null)" -var="instance-name=test-$(date +%s)" -auto-approve
+
+# get the IP from terraform
+echo $(terraform output ip) > _microk8s_ip
+
+# patch the IP into the kubectl config
+[TODO (sed)]
+
+# kubectl can now deploy to microk8s
+kubectl apply -f ./k8s
 ```
 
 

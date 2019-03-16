@@ -1,9 +1,18 @@
 steps:
 
-- name: terraform
-  TODO
+[TODO!]
 
-# UNCOMMENT below after getting the VM going
+0. build container images and push
+1. terraform: make [self-destructing] VM [with microk8s]
+2. terraform: retrieve VM's ephemeral IP (via terraform output ip) and write to file
+3. bash: sed the IP into the kubeconfig
+4. kubectl apply the application
+5. run the test
+6. destroy the VM
+
+(if any of steps 1-5 fail, #6 won't be reached, but self-destruct mechanism will kick in)
+
+  
 
 # - id: 'build web container'
 #   name: 'gcr.io/cloud-builders/docker'
