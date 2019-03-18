@@ -1,0 +1,125 @@
+steps:
+
+# 1. terraform: make [self-destructing] VM [with microk8s]
+# 2. terraform: retrieve VM's ephemeral IP (via terraform output ip) and write to file
+# 3. bash: sed the IP into the kubeconfig
+# 4. kubectl apply the application
+# 5. run the test
+# 6. destroy the VM
+
+# (if any of steps 1-5 fail, #6 won't be reached, but self-destruct mechanism will kick in)
+
+- id: 'init terraform' 
+  name: 'gcr.io/$PROJECT_ID/terraform'
+  args: ['init']
+
+- id: 'launch vm'
+  name: 'gcr.io/$PROJECT_ID/terraform'
+  args: [
+    'apply',
+    '-var=project-name=$PROJECT_ID',
+    '-var=instance-name=test-$BUILD_ID',
+    '-auto-approve'
+  ]
+
+- id: 'patch kubeconfig'
+  name: 'gcr.io/$PROJECT_ID/terraform'
+  entrypoint: '/bin/bash'
+  args:
+    - '-c'
+    - |
+      echo $(terraform output ip) > _endpoint
+      sed -i.sed-bak "s/CLUSTER_IP/"$(< _endpoint)"/" kubeconfig.microk8s
+      cat kubeconfig.microk8s
+
+- id: 'build web'
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--tag=web', 
+    '--tag=gcr.io/$PROJECT_ID/web',
+    '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
+    'web/.',
+  ]
+
+- id: 'build db'
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--tag=mysql',
+    '--tag=gcr.io/$PROJECT_ID/mysql',
+    '--cache-from', 'gcr.io/$PROJECT_ID/mysql:latest',
+    'mysql/.',
+  ]
+  env:
+  - "MYSQL_ROOT_PASSWORD=password"
+
+- id: 'push web'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/web']
+
+- id: 'push db'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/mysql'] 
+
+# - id: 'Create namespace'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['create','namespace','$BUILD_ID']
+
+- id: 'deploy app'
+  # use vanilla kubectl container b/c this isn't GKE
+  name: 'bitnami/kubectl'
+  args: [
+    'apply', 
+    '-f', 
+    'k8s/', 
+    # '--namespace=$BUILD_ID',
+    '--kubeconfig=kubeconfig.microk8s'
+    ] 
+
+# - id: 'Get endpoint of web service'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   entrypoint: 'bash'
+#   args: 
+#   - '-c'
+#   - |
+#     get_ip() {
+#       kubectl get service cookieshop-web --namespace=$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
+#     }
+
+#     until [[ -n "$(get_ip)" ]]; do
+#         echo "waiting for ip"
+#         sleep 3
+#     done
+
+#     echo "$(get_ip)" > _endpoint
+
+- id: 'test'
+  name: 'gcr.io/cloud-builders/curl'
+  entrypoint: '/bin/bash'
+  args: 
+  - '-c'
+  - |
+    # cat _endpoint
+    ### -r = retries; -i = interval; -k = keyword to search for ###
+    ./test/test-connection.sh -r 20 -i 5 -u http://$(cat _endpoint):30000 &&
+    ./test/test-content.sh -r 20 -i 5 -u http://$(cat _endpoint):30000 -k 'Chocolate Chip'
+
+- id: 'delete vm'
+  name: 'gcr.io/$PROJECT_ID/terraform'
+  args: [
+    'destroy',
+    '-var=project-name=$PROJECT_ID',
+    '-var=instance-name=test-$BUILD_ID',
+    '-auto-approve'
+  ]
+
+# - id: 'Delete namespace'
+#   name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['delete', 'namespaces', '$BUILD_ID']
+
+# options:
+#   env:
+#     # location/name of GKE cluster (used by all kubectl commands)
+#     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
+#     - CLOUDSDK_CONTAINER_CLUSTER=staging
