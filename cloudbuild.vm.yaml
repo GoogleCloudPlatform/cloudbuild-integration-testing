@@ -28,8 +28,8 @@ steps:
   args:
     - '-c'
     - |
-      echo $(terraform output ip) > _endpoint
-      sed -i.sed-bak "s/CLUSTER_IP/"$(< _endpoint)"/" kubeconfig.microk8s
+      echo $(terraform output ip) > _clusterip
+      sed -i.sed-bak "s/CLUSTER_IP/"$(< _clusterip)"/" kubeconfig.microk8s
       cat kubeconfig.microk8s
 
 - id: 'build web'
@@ -77,22 +77,24 @@ steps:
     '--kubeconfig=kubeconfig.microk8s'
     ] 
 
-# - id: 'Get endpoint of web service'
-#   name: 'gcr.io/cloud-builders/kubectl'
-#   entrypoint: 'bash'
-#   args: 
-#   - '-c'
-#   - |
-#     get_ip() {
-#       kubectl get service cookieshop-web --namespace=$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
-#     }
+- id: 'Get endpoint of web service'
+  name: 'gcr.io/cloud-builders/kubectl'
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+    # determine which node port the service was exposed on
+    get_nodeport() {
+      # kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.spec.ports[0].nodePort}' 
+      kubectl get service cookieshop-web -o=jsonpath='{.spec.ports[0].nodePort}' --kubeconfig=kubeconfig.microk8s
+    }
 
-#     until [[ -n "$(get_ip)" ]]; do
-#         echo "waiting for ip"
-#         sleep 3
-#     done
+    until [[ -n "$(get_nodeport)" ]]; do
+        echo "querying for nodeport"
+        sleep 3
+    done
 
-#     echo "$(get_ip)" > _endpoint
+    echo "$(get_nodeport)" > _nodeport
 
 - id: 'test'
   name: 'gcr.io/cloud-builders/curl'
@@ -102,8 +104,8 @@ steps:
   - |
     # cat _endpoint
     ### -r = retries; -i = interval; -k = keyword to search for ###
-    ./test/test-connection.sh -r 20 -i 5 -u http://$(cat _endpoint):30000 &&
-    ./test/test-content.sh -r 20 -i 5 -u http://$(cat _endpoint):30000 -k 'Chocolate Chip'
+    ./test/test-connection.sh -r 20 -i 5 -u http://$(cat _clusterip):$(cat _nodeport) &&
+    ./test/test-content.sh -r 20 -i 5 -u http://$(cat _clusterip):$(cat _nodeport) -k 'Chocolate Chip'
 
 - id: 'delete vm'
   name: 'gcr.io/$PROJECT_ID/terraform'
