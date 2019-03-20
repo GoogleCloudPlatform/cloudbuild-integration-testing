@@ -43,16 +43,33 @@ steps:
   args: 
   - '-c'
   - |
-    get_ip() {
-      kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.status.loadBalancer.ingress[0].ip}' 
+    # determine which node port the service was exposed on
+    get_nodeport() {
+      kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.spec.ports[0].nodePort}' 
     }
 
-    until [[ -n "$(get_ip)" ]]; do
-        echo "waiting for ip"
+    until [[ -n "$(get_nodeport)" ]]; do
+        echo "querying for nodeport"
         sleep 3
     done
 
-    echo "$(get_ip)" > _endpoint
+    echo "$(get_nodeport)" > _nodeport
+
+    # grab the public IP of a random node
+    # (why do this instead of a load balancer? b/c it's faster to instantiate)
+    # (and doesn't require additional billable resources)
+    # (we can reasonably expect the node to be durable enough to last until the test completes)
+    get_nodeip() {
+      kubectl get nodes --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}'
+    }
+
+    until [[ -n "$(get_nodeip)" ]]; do
+        echo "querying for nodeip"
+        sleep 3
+    done
+
+
+    echo $(get_nodeip) > _nodeip
 
 - id: 'run E2E tests'
   name: 'gcr.io/cloud-builders/curl'
@@ -60,10 +77,9 @@ steps:
   args: 
   - '-c'
   - |
-    cat _endpoint;
     ### -r = retries; -i = interval; -k = keyword to search for ###
-    ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _endpoint):3000
-    ./test/test-content.sh -r 20 -i 3 -u http://$(cat _endpoint):3000 -k 'Chocolate Chip'
+    ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _nodeip):$(cat _nodeport)
+    ./test/test-content.sh -r 20 -i 3 -u http://$(cat _nodeip):$(cat _nodeport) -k 'Chocolate Chip'
 
 - id: 'Delete namespace'
   name: 'gcr.io/cloud-builders/kubectl'
