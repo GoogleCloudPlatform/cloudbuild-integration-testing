@@ -6,7 +6,7 @@ Prerequisite:
 Build the [docker-compose community builder](https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/docker-compose) and push to [Google Container Registry](https://cloud.google.com/container-registry/) in your GCP project
 
 Run command:
-`gcloud builds submit --config=compose.cloudbuild.yaml .`
+`gcloud builds submit --config=cloudbuild.compose.yaml .`
 
 ## Method 2: deploy to existing kubernetes cluster [WIP]
 Prerequisites:
@@ -16,7 +16,7 @@ Prerequisites:
 0. Cloud Build service account must have role: "Kubernetes Engine Developer"
 - TODO: add service account gcloud command
 Run command:
-`gcloud builds submit --config=gke.cloudbuild.yaml .`
+`gcloud builds submit --config=cloudbuild.gke.yaml .`
 
 ## Method 3: deploy to self-destructing VM [TODO]
 
@@ -43,7 +43,7 @@ kubectl get services --kubeconfig=kubeconfig.microk8s
 ### to do things in Cloud Build:
 (prerequisite: terraform builder is built and pushed to GCR in project)
 ```
-gcloud builds submit --config=vm.cloudbuild.yaml .
+gcloud builds submit --config=cloudbuild.vm.yaml .
 ```
 
 
