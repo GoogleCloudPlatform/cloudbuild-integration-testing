@@ -45,7 +45,7 @@ echo "url: "$url
 
 for i in $(seq 0 $retries); do
     
-    html="$(curl -si $url)"
+    html="$(curl -si $url)" || html=""
     
     if echo "$html" | grep -q "$keyword"
     then
