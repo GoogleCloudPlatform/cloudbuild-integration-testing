@@ -144,3 +144,6 @@ override.tf.json
 # omit individual lil' temp files
 .tmp.*
 *.sed-bak
+
+# omit this which is created by MacOS tools I guess?
+default.profraw
