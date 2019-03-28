@@ -27,18 +27,18 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  // startup script:
+  // startup:
   // 1. install microk8s
+    // (using a custom microk8s; see https://github.com/GoogleCloudPlatform/cloudbuild-integration-testing/issues/36)
   // 2. program instance for self-deletion
   metadata = {
     startup-script = <<-SCRIPT
-    # install microk8s
-    gsutil cp gs://sandbox-integration-testing-misc/microk8s_v1.11.7_amd64.snap ./microk8s.snap
+    gsutil cp 'gs://sandbox-integration-testing-misc/microk8s_v1.11.7_amd64.snap' ./microk8s.snap
     chmod +x ./microk8s.snap
-    sudo snap install microk8s.snap --classic --dangerous
+    snap install microk8s.snap --classic --dangerous
+    microk8s.status --wait-ready
     microk8s.enable dns
-
-    # initialize self-destruct timer
+    microk8s.status --wait-ready
     echo "gcloud compute instances delete $(hostname) --zone $(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/zone -s | cut -d/ -f4) -q" | at Now + ${var.self-destruct-timeout-minutes} Minutes
     SCRIPT
   }
