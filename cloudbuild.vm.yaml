@@ -12,6 +12,7 @@ steps:
 - id: 'init terraform' 
   name: 'gcr.io/$PROJECT_ID/terraform'
   args: ['init']
+  waitFor: ['-']
 
 - id: 'launch vm'
   name: 'gcr.io/$PROJECT_ID/terraform'
@@ -21,6 +22,7 @@ steps:
     '-var=instance-name=test-$BUILD_ID',
     '-auto-approve'
   ]
+  waitFor: ['init terraform']
 
 - id: 'patch kubeconfig'
   name: 'gcr.io/$PROJECT_ID/terraform'
@@ -31,6 +33,7 @@ steps:
       echo $(terraform output ip) > _clusterip
       sed -i.sed-bak "s/CLUSTER_IP/"$(< _clusterip)"/" kubeconfig.microk8s
       cat kubeconfig.microk8s
+  waitFor: ['launch vm']
 
 - id: 'build web'
   name: 'gcr.io/cloud-builders/docker'
@@ -41,6 +44,7 @@ steps:
     '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
     'web/.',
   ]
+  waitFor: ['-']
 
 - id: 'build db'
   name: 'gcr.io/cloud-builders/docker'
@@ -53,14 +57,17 @@ steps:
   ]
   env:
   - "MYSQL_ROOT_PASSWORD=password"
+  waitFor: ['-']
 
 - id: 'push web'
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/web']
+  waitFor: ['build web']
 
 - id: 'push db'
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/mysql'] 
+  waitFor: ['build db']
 
 # - id: 'Create namespace'
 #   name: 'gcr.io/cloud-builders/kubectl'
@@ -76,8 +83,9 @@ steps:
     # '--namespace=$BUILD_ID',
     '--kubeconfig=kubeconfig.microk8s'
     ] 
+  waitFor: ['patch kubeconfig']
 
-- id: 'Get endpoint of web service'
+- id: 'get endpoint'
   name: 'gcr.io/cloud-builders/kubectl'
   entrypoint: 'bash'
   args: 
@@ -95,6 +103,7 @@ steps:
     done
 
     echo "$(get_nodeport)" > _nodeport
+  waitFor: ['deploy app']  
 
 - id: 'test'
   name: 'gcr.io/cloud-builders/curl'
@@ -106,6 +115,7 @@ steps:
     ### -r = retries; -i = interval; -k = keyword to search for ###
     ./test/test-connection.sh -r 20 -i 5 -u http://$(cat _clusterip):$(cat _nodeport) &&
     ./test/test-content.sh -r 20 -i 5 -u http://$(cat _clusterip):$(cat _nodeport) -k 'Chocolate Chip'
+  waitFor: ['get endpoint']
 
 - id: 'delete vm'
   name: 'gcr.io/$PROJECT_ID/terraform'
@@ -115,6 +125,7 @@ steps:
     '-var=instance-name=test-$BUILD_ID',
     '-auto-approve'
   ]
+  waitFor: ['test']
 
 # - id: 'Delete namespace'
 #   name: 'gcr.io/cloud-builders/kubectl'
