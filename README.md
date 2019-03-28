@@ -8,17 +8,17 @@ Build the [docker-compose community builder](https://github.com/GoogleCloudPlatf
 Run command:
 `gcloud builds submit --config=cloudbuild.compose.yaml .`
 
-## Method 2: deploy to existing kubernetes cluster [WIP]
+## Method 2: deploy to existing kubernetes cluster
 Prerequisites:
 
-0. A running kubernetes cluster (this example uses GKE)
-- `gcloud container clusters create staging --zone us-central1-c` 
-0. Cloud Build service account must have role: "Kubernetes Engine Developer"
-- TODO: add service account gcloud command
-Run command:
-`gcloud builds submit --config=cloudbuild.gke.yaml .`
+1. A running kubernetes cluster (this example uses GKE)
+  - `gcloud container clusters create staging --zone us-central1-c` 
+2. Cloud Build service account must have role: "Kubernetes Engine Developer"
+  - TODO: add service account gcloud command
+  Run command:
+  `gcloud builds submit --config=cloudbuild.gke.yaml .`
 
-## Method 3: deploy to self-destructing VM [TODO]
+## Method 3: deploy to self-destructing VM
 
 ### to do things locally:
 ```
