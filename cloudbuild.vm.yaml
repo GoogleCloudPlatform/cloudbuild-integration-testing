@@ -33,6 +33,29 @@ steps:
       echo $(terraform output ip) > _clusterip
       sed -i.sed-bak "s/CLUSTER_IP/"$(< _clusterip)"/" kubeconfig.microk8s
       cat kubeconfig.microk8s
+
+      # loop until connection works
+      # TODO: replace this with a looped kubectl connection    
+      apt-get update && apt-get -y install curl
+
+      for i in $$(seq 0 59); do
+      
+        status="$$(curl -sL -w "%{http_code}" -I "http://$$(< _clusterip):8080" -o /dev/null)" || status='000'
+        
+        if [[ $status == '200' ]]
+        then
+          echo "connected to kubernetes api"
+          break
+        else
+            if [ $$i -gt 0 ]; then
+              echo "unable to connect. retrying in 5s..."
+              sleep 5
+            fi
+        fi
+      done
+
+
+
   waitFor: ['launch vm']
 
 - id: 'build web'
