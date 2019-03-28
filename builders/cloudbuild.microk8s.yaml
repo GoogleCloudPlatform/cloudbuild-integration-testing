@@ -1,0 +1,20 @@
+# prerequisite: the packer builder must be built and pushed to GCR in the project that Cloud Build is run from
+# https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/packer
+
+
+#TODO: Create a packer build that will bake the microk8s image
+
+steps:
+- name: 'gcr.io/$PROJECT_ID/packer'
+  args: [
+    'build',
+    '-var','region=us-central1',
+    '-var','source_image_family=ubuntu-1804-lts',
+    '-var','machine_type=n1-standard-8',
+    '-var','zone=us-central1-c',
+    '-var','project_id=$PROJECT_ID',
+    '-var','image_name=microk8s-packer-01',
+    'microk8s.packer.json'
+  ]
+timeout:
+  1800s
