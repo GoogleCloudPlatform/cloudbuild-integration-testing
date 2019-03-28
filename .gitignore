@@ -147,3 +147,7 @@ override.tf.json
 
 # omit this which is created by MacOS tools I guess?
 default.profraw
+
+# omit temp files created during build process
+_endpoint
+_nodeport
