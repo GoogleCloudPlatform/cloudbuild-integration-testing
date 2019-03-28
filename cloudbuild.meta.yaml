@@ -1,0 +1,32 @@
+# verify that all three testing methods work
+
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+      'builds', 
+      'submit',
+      '--config=cloudbuild.compose.yaml',
+      '.'
+  ]
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+      'builds', 
+      'submit',
+      '--config=cloudbuild.gke.yaml',
+      '.'
+  ]
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+      'builds', 
+      'submit',
+      '--config=cloudbuild.vm.yaml',
+      '.'
+  ]
+  waitFor: ['-']
+
+timeout:
+  3600s
