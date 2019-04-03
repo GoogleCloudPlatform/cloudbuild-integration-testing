@@ -151,3 +151,6 @@ default.profraw
 # omit temp files created during build process
 _endpoint
 _nodeport
+
+# omit eclipse settings if people are using eclipse
+.settings
