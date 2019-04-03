@@ -14,10 +14,15 @@
 
 steps:
 
-# - id: 'compile and unit test'
-#   name: 'gcr.io/cloud-builders/npm'
-#   dir: 'web'
-#   args: ['test']
+- id: 'compile'
+  name: 'gcr.io/cloud-builders/npm'
+  dir: 'web'
+  args: ['install']
+
+- id: 'unit test'
+  name: 'gcr.io/cloud-builders/npm'
+  dir: 'web'
+  args: ['test']
 
 - id: 'build web'
   name: 'gcr.io/cloud-builders/docker'
