@@ -92,10 +92,6 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/mysql'] 
   waitFor: ['build db']
 
-# - id: 'Create namespace'
-#   name: 'gcr.io/cloud-builders/kubectl'
-#   args: ['create','namespace','$BUILD_ID']
-
 - id: 'deploy app'
   # use vanilla kubectl container b/c this isn't GKE
   name: 'bitnami/kubectl'
@@ -103,7 +99,6 @@ steps:
     'apply', 
     '-f', 
     'k8s/', 
-    # '--namespace=$BUILD_ID',
     '--kubeconfig=kubeconfig.microk8s'
     ] 
   waitFor: ['patch kubeconfig']
@@ -116,7 +111,6 @@ steps:
   - |
     # determine which node port the service was exposed on
     get_nodeport() {
-      # kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.spec.ports[0].nodePort}' 
       kubectl get service cookieshop-web -o=jsonpath='{.spec.ports[0].nodePort}' --kubeconfig=kubeconfig.microk8s
     }
 
@@ -128,7 +122,7 @@ steps:
     echo "$(get_nodeport)" > _nodeport
   waitFor: ['deploy app']  
 
-- id: 'test'
+- id: 'integration test'
   name: 'gcr.io/cloud-builders/curl'
   entrypoint: '/bin/bash'
   args: 
@@ -148,17 +142,7 @@ steps:
     '-var=instance-name=test-$BUILD_ID',
     '-auto-approve'
   ]
-  waitFor: ['test']
-
-# - id: 'Delete namespace'
-#   name: 'gcr.io/cloud-builders/kubectl'
-#   args: ['delete', 'namespaces', '$BUILD_ID']
-
-# options:
-#   env:
-#     # location/name of GKE cluster (used by all kubectl commands)
-#     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
-#     - CLOUDSDK_CONTAINER_CLUSTER=staging
+  waitFor: ['integration test']
 
 timeout:
   3600s

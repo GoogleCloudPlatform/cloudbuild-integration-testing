@@ -19,7 +19,7 @@ steps:
 #   dir: 'web'
 #   args: ['test']
 
-- id: 'build web container'
+- id: 'build web'
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
@@ -28,8 +28,9 @@ steps:
     '--cache-from=gcr.io/$PROJECT_ID/web:latest',
     'web/.',
   ]
+  waitFor: ['-'] # start immediately
 
-- id: 'build database container'
+- id: 'build db'
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
@@ -38,8 +39,9 @@ steps:
     '--cache-from', 'gcr.io/$PROJECT_ID/mysql:latest',
     'mysql/.',
   ]
+  waitFor: ['-'] # start immediately
 
-- id: 'Create Environment'
+- id: 'compose up'
   name: 'gcr.io/$PROJECT_ID/docker-compose:latest'
   entrypoint: '/bin/bash'
   args:
@@ -48,8 +50,9 @@ steps:
     docker-compose up -d 
   env:
   - 'PROJECT_ID=$PROJECT_ID'
+  waitFor: ['build web','build db']
 
-- id: 'run E2E tests'
+- id: 'integration tests'
   name: 'gcr.io/$PROJECT_ID/docker-compose:latest'
   entrypoint: '/bin/bash'
   args: 
@@ -58,6 +61,7 @@ steps:
       ### -r = retries; -i = interval; -k = keyword to search for ###
       ./test/test-connection.sh -r 20 -i 3 -u http://web:3000
       ./test/test-content.sh -r 20 -i 3 -u http://web:3000 -k 'Chocolate Chip'
+  waitFor: ['compose up']
 
 images:
 - gcr.io/$PROJECT_ID/web
