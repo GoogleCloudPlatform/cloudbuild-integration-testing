@@ -1,5 +1,5 @@
 steps:
-- id: 'build web container'
+- id: 'build web'
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
@@ -8,8 +8,9 @@ steps:
     '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
     'web/.',
   ]
+  waitFor: ['-'] # start immediately
 
-- id: 'build database container'
+- id: 'build db'
   name: 'gcr.io/cloud-builders/docker'
   args: [
     'build',
@@ -20,24 +21,29 @@ steps:
   ]
   env:
   - "MYSQL_ROOT_PASSWORD=password"
+  waitFor: ['-'] # start immediately
 
-- id: 'Push web image'
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/web']
-
-- id: 'Push database image'
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/mysql']
-    
-- id: 'Create namespace'
+- id: 'make namespace'
   name: 'gcr.io/cloud-builders/kubectl'
   args: ['create','namespace','test-$BUILD_ID']
+  waitFor: ['-'] # start immediately
 
-- id: 'Deploy application to cluster'
+- id: 'push web'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/web']
+  waitFor: ['build web']
+
+- id: 'push db'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/mysql']
+  waitFor: ['build db']
+
+- id: 'deploy to staging'
   name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/', '--namespace=test-$BUILD_ID'] 
+  waitFor: ['push web','push db']
 
-- id: 'Get endpoint of web service'
+- id: 'get endpoint'
   name: 'gcr.io/cloud-builders/kubectl'
   entrypoint: 'bash'
   args: 
@@ -53,7 +59,7 @@ steps:
         sleep 3
     done
 
-    echo "$(get_nodeport)" > _nodeport
+    echo "$(get_nodeport)" > _nodeport # save port for use in next step
 
     # grab the public IP of a random node
     # (why do this instead of a load balancer? b/c it's faster to instantiate)
@@ -68,10 +74,11 @@ steps:
         sleep 3
     done
 
+    echo $(get_nodeip) > _nodeip # save ip for use in next step
 
-    echo $(get_nodeip) > _nodeip
+  waitFor: ['deploy to staging']
 
-- id: 'run E2E tests'
+- id: 'integration tests'
   name: 'gcr.io/cloud-builders/curl'
   entrypoint: '/bin/bash'
   args: 
@@ -80,10 +87,12 @@ steps:
     ### -r = retries; -i = interval; -k = keyword to search for ###
     ./test/test-connection.sh -r 20 -i 3 -u http://$(cat _nodeip):$(cat _nodeport)
     ./test/test-content.sh -r 20 -i 3 -u http://$(cat _nodeip):$(cat _nodeport) -k 'Chocolate Chip'
+  waitFor: ['get endpoint']
 
-- id: 'Delete namespace'
+- id: 'delete namespace'
   name: 'gcr.io/cloud-builders/kubectl'
   args: ['delete', 'namespaces', 'test-$BUILD_ID']
+  waitFor: ['integration tests']
 
 options:
   env:
