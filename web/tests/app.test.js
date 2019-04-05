@@ -22,8 +22,4 @@ describe('server', () => {
         done();
       });
   });
-
-  it('should return cookies at root', (done) => {
-    done();
-  });
 });

@@ -46,8 +46,7 @@ describe('getProducts', () => {
     const callback = sinon.spy();
 
     getProducts(callback).catch(err => {
-        // expect(err).to.be.a('error');
-        return;
+      expect(err).to.be.instanceOf(Error);
     });
     query.restore();
     
