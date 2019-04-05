@@ -21,12 +21,14 @@ router.get('/', async (req, res) => {
 
   let products;
   
-  // try {
-  products = await getProducts().catch(err => {
-    console.error('error: unable to fetch products' + err);
+  try {
+    products = await getProducts();
+  } catch (err) {
+  // products = await getProducts().catch(err => {
+    // console.error('error: unable to fetch products' + err);
     const errorMsg =[{name: '[DATABASE ERROR: unable to fetch products] ' + Date.now()}];
-    return errorMsg;
-  });
+    products = errorMsg;
+  }
 
   res.render('index', { 
     title: 'Cloud Cookie Shop',
