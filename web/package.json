@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "lint": "eslint . bin/www",
-    "test": "npm run lint"
+    "test": "mocha tests/ --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -14,9 +14,13 @@
     "http-errors": "^1.6.3",
     "morgan": "~1.9.0",
     "mysql": "^2.16.0",
-    "pug": "2.0.0-beta11"
+    "pug": "^2.0.3"
   },
   "devDependencies": {
-    "eslint": "^5.12.0"
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "eslint": "^5.12.0",
+    "mocha": "^6.0.2",
+    "sinon": "^7.3.1"
   }
 }

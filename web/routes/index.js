@@ -23,11 +23,11 @@ router.get('/', async (req, res) => {
   
   try {
     products = await getProducts();
-  }
-  catch (e) {
-    console.error('error: unable to fetch products');
-    console.debug(e);
-    products = [{name: '[DATABASE ERROR: unable to fetch products] ' + Date.now()}];
+  } catch (err) {
+  // products = await getProducts().catch(err => {
+    // console.error('error: unable to fetch products' + err);
+    const errorMsg =[{name: '[DATABASE ERROR: unable to fetch products] ' + Date.now()}];
+    products = errorMsg;
   }
 
   res.render('index', { 

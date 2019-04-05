@@ -58,6 +58,18 @@ steps:
 
   waitFor: ['launch vm']
 
+- id: 'compile web app'
+  name: 'gcr.io/cloud-builders/npm'
+  dir: 'web'
+  args: ['install']
+  waitFor: ['-'] 
+
+- id: 'web app unit tests'
+  name: 'gcr.io/cloud-builders/npm'
+  dir: 'web'
+  args: ['test']
+  waitFor: ['compile web app']
+
 - id: 'build web'
   name: 'gcr.io/cloud-builders/docker'
   args: [
@@ -67,7 +79,7 @@ steps:
     '--cache-from', 'gcr.io/$PROJECT_ID/web:latest',
     'web/.',
   ]
-  waitFor: ['-']
+  waitFor: ['web app unit tests']
 
 - id: 'build db'
   name: 'gcr.io/cloud-builders/docker'
