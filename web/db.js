@@ -15,8 +15,7 @@
 var mysql = require('mysql');
 
 // set database host from environment var; defaults to localhost
-let db_host = 'localhost';
-if(process.env.DB_HOST) db_host = process.env.DB_HOST;
+const db_host = process.env.DB_HOST || 'localhost';
 
 console.info(`db_host: ${db_host}`);
 
