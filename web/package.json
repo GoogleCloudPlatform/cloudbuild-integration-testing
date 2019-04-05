@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "lint": "eslint . bin/www",
-    "test": "mocha tests/api.test.js --exit"
+    "test": "mocha tests/ --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -20,6 +20,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "eslint": "^5.12.0",
-    "mocha": "^6.0.2"
+    "mocha": "^6.0.2",
+    "sinon": "^7.3.1"
   }
 }

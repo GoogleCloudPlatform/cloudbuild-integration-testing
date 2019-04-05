@@ -17,19 +17,24 @@ const router = express.Router();
 const getProducts = require('../api/getProducts');
 
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
 
   let products;
   
-  try {
-    products = await getProducts();
-  }
-  catch (e) {
-    console.error('error: unable to fetch products');
-    console.debug(e);
+  // try {
+  //   products = await getProducts();
+  // }
+  // catch (e) {
+  //   console.error('error: unable to fetch products' + e);
+  //   products = [{name: '[DATABASE ERROR: unable to fetch products] ' + Date.now()}];
+  // }
+  getProducts().then(result => {
+    products = result;
+  }).catch(err => {
+    console.error('unable to fetch products, err: ' + err);
     products = [{name: '[DATABASE ERROR: unable to fetch products] ' + Date.now()}];
-  }
-
+ 
+  });
   res.render('index', { 
     title: 'Cloud Cookie Shop',
     location: 'Jersey City',
