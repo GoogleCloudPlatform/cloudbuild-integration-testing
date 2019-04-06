@@ -16,7 +16,7 @@ gcloud builds submit --config=cloudbuild.compose.yaml .
 ## Method 2: Deploy to Existing Kubernetes Cluster
 ### Prerequisites
 
-1.  A running cluster in Google Kubernetes Engine
+1.  Create a cluster in Google Kubernetes Engine
     ```
     gcloud container clusters create staging --zone us-central1-c
     ```
@@ -25,7 +25,7 @@ gcloud builds submit --config=cloudbuild.compose.yaml .
 
 1. Update the `image` field in `k8s/db.yaml` and `k8s/web.yaml` with your Project ID to push images to your project's Container Registry.
 
-1. Cloud Build service account must have IAM role: "Kubernetes Engine Developer"
+1. Add IAM role "Kubernetes Engine Developer" to Cloud Build Service Account
     ```
     gcloud projects add-iam-policy-binding <PROJECT-ID> \ 
     --member serviceAccount:<PROJECT-NUMBER>@cloudbuild.gserviceaccount.com \
@@ -35,8 +35,21 @@ gcloud builds submit --config=cloudbuild.compose.yaml .
 
 ### Running Build
 ```
-gcloud builds submit --config cloudbuild.gke.yaml
+gcloud builds submit --config cloudbuild.gke.yaml .
 ```
+
+### When you're done
+1. Delete Kubernetes Cluster
+    ```
+    gcloud container clusters delete staging --zone us-central1-c
+    ```
+1. Remove GKE permissions from Cloud Build
+    ```
+    gcloud projects remove-iam-policy-binding <YOUR-PROJECT-ID> \ 
+    --member serviceAccount:<YOUR-PROJECT-NUMBER>@cloudbuild.gserviceaccount.com \
+    --role roles/container.developer
+    ```
+
 
 ## Method 3: deploy to self-destructing VM
 
