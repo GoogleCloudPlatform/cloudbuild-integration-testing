@@ -11,23 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# kind: Service
-# apiVersion: v1
-# metadata:
-#   name: cookieshop-web
-#   labels:
-#     app: cookieshop
-#     role: web
-# spec:
-#   type: NodePort
-#   ports:
-#   - port: 3000
-#     targetPort: 3000
-#   selector:
-#     role: web
-#     app: cookieshop
----
 kind: Service
 apiVersion: v1
 metadata:
