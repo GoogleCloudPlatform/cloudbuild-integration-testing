@@ -50,10 +50,26 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/mysql']
   waitFor: ['build db']
 
+- id: 'kustomize build'
+  name: 'gcr.io/$PROJECT_ID/kustomize:latest'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    # update images in k8s config to point to project's container registry
+    kustomize edit set image USER-REPO/web=gcr.io/$PROJECT_ID/web:latest
+    kustomize edit set image USER-REPO/mysql=gcr.io/$PROJECT_ID/mysql:latest
+    # save output to _config.yaml
+    kustomize build . > _config.yaml
+    # print to console
+    cat _config.yaml
+  dir: 'k8s'
+  waitFor: ['-']
+
 - id: 'deploy to staging'
   name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/', '--namespace=test-$BUILD_ID'] 
-  waitFor: ['push web','push db']
+  args: ['apply', '-f', 'k8s/_config.yaml', '--namespace=test-$BUILD_ID'] 
+  waitFor: ['push web','push db', 'kustomize build']
 
 - id: 'get endpoint'
   name: 'gcr.io/cloud-builders/kubectl'
