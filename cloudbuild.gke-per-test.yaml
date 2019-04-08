@@ -6,7 +6,10 @@ steps:
   args: 
     - '-c'
     - |
-      gcloud container clusters create test-$$(date +%s)
+      # capture the cluster name to be created
+      # (it will be used again for the deletion)
+      echo "test-$(date +%s)" > _cluster-name
+      gcloud container clusters create $(cat _cluster-name)
   waitFor: ['-'] # start immediately
 
 - id: 'compile web app'
@@ -55,10 +58,16 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/mysql']
   waitFor: ['build db']
 
+- id: 'patch k8s config'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args: ['-c','find k8s -type f | xargs sed -i "s/PROJECT_ID/$PROJECT_ID/g"']
+  waitFor: ['-']
+
 - id: 'deploy to staging'
   name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/',] 
-  waitFor: ['push web','push db','create cluster']
+  waitFor: ['push web','push db','create cluster','patch k8s config']
 
 - id: 'get endpoint'
   name: 'gcr.io/cloud-builders/kubectl'
@@ -108,11 +117,11 @@ steps:
 
 - id: 'delete cluster'
   name: 'gcr.io/cloud-builders/gcloud'
-  args: [
-    'container','clusters','delete',
-    'test-$BUILD_ID', # unique cluster name
-    '--quiet', # don't prompt for confirmation
-  ]
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+    gcloud container clusters delete $(cat _cluster-name) --quiet # don't prompt for confirmation
   waitFor: ['integration tests']
 
 options:
