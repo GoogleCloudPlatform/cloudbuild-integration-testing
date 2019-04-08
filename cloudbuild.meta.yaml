@@ -1,7 +1,8 @@
 # verify that all three testing methods work
 
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
+- id: 'Docker Compose'
+  name: 'gcr.io/cloud-builders/gcloud'
   args: [
       'builds', 
       'submit',
@@ -10,7 +11,8 @@ steps:
   ]
   waitFor: ['-']
 
-- name: 'gcr.io/cloud-builders/gcloud'
+- id: 'GKE staging cluster'
+  name: 'gcr.io/cloud-builders/gcloud'
   args: [
       'builds', 
       'submit',
@@ -19,7 +21,8 @@ steps:
   ]
   waitFor: ['-']
 
-- name: 'gcr.io/cloud-builders/gcloud'
+- id: 'Single-node Kubernetes'
+  name: 'gcr.io/cloud-builders/gcloud'
   args: [
       'builds', 
       'submit',
