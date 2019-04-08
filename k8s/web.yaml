@@ -33,7 +33,7 @@ spec:
       containers:
       - name: web
         # Dev TODO: add your project id here
-        image: gcr.io/PROJECT-ID/web:latest
+        image: USER-REPO/web:latest
         env:
         - name: DB_HOST
           value: cookieshop-db
