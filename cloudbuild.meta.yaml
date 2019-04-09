@@ -1,4 +1,4 @@
-# verify that all three testing methods work
+# verify that all testing methods work
 
 steps:
 - id: 'Docker Compose'
