@@ -31,5 +31,15 @@ steps:
   ]
   waitFor: ['-']
 
+- id: 'GKE cluster per test'
+  name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+      'builds', 
+      'submit',
+      '--config=cloudbuild.gke-per-test.yaml',
+      '.'
+  ]
+  waitFor: ['-']
+
 timeout:
   3600s

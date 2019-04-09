@@ -24,6 +24,12 @@ steps:
   ]
   waitFor: ['init terraform']
 
+- id: 'patch k8s config'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args: ['-c','find k8s -type f | xargs sed -i "s/PROJECT_ID/$PROJECT_ID/g"']
+  waitFor: ['-']
+
 - id: 'patch kubeconfig'
   name: 'gcr.io/$PROJECT_ID/terraform'
   entrypoint: '/bin/bash'
