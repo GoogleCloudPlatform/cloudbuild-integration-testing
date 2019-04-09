@@ -13,6 +13,19 @@
 # limitations under the License.
 
 steps:
+
+- id: 'create cluster'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args: 
+    - '-c'
+    - |
+      # capture the cluster name to be created
+      # (it will be used again for the deletion)
+      echo "test-$(date +%s)" > _cluster-name
+      gcloud container clusters create $(cat _cluster-name)
+  waitFor: ['-'] # start immediately
+
 - id: 'compile web app'
   name: 'gcr.io/cloud-builders/npm'
   dir: 'web'
@@ -49,11 +62,6 @@ steps:
   - "MYSQL_ROOT_PASSWORD=password"
   waitFor: ['-'] # start immediately
 
-- id: 'make namespace'
-  name: 'gcr.io/cloud-builders/kubectl'
-  args: ['create','namespace','test-$BUILD_ID']
-  waitFor: ['-'] # start immediately
-
 - id: 'push web'
   name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/web']
@@ -72,8 +80,8 @@ steps:
 
 - id: 'deploy to staging'
   name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/', '--namespace=test-$BUILD_ID'] 
-  waitFor: ['push web','push db','patch k8s config']
+  args: ['apply', '-f', 'k8s/',] 
+  waitFor: ['push web','push db','create cluster','patch k8s config']
 
 - id: 'get endpoint'
   name: 'gcr.io/cloud-builders/kubectl'
@@ -83,7 +91,7 @@ steps:
   - |
     # determine which node port the service was exposed on
     get_nodeport() {
-      kubectl get service cookieshop-web --namespace=test-$BUILD_ID -o=jsonpath='{.spec.ports[0].nodePort}' 
+      kubectl get service cookieshop-web -o=jsonpath='{.spec.ports[0].nodePort}' 
     }
 
     until [[ -n "$(get_nodeport)" ]]; do
@@ -121,9 +129,13 @@ steps:
     ./test/test-content.sh -r 20 -i 3 -u http://$(cat _nodeip):$(cat _nodeport) -k 'Chocolate Chip'
   waitFor: ['get endpoint']
 
-- id: 'delete namespace'
-  name: 'gcr.io/cloud-builders/kubectl'
-  args: ['delete', 'namespaces', 'test-$BUILD_ID']
+- id: 'delete cluster'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+    gcloud container clusters delete $(cat _cluster-name) --quiet # don't prompt for confirmation
   waitFor: ['integration tests']
 
 options:
@@ -131,3 +143,6 @@ options:
     # location/name of GKE cluster (used by all kubectl commands)
     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
     - CLOUDSDK_CONTAINER_CLUSTER=staging
+
+timeout:
+  3600s

@@ -33,7 +33,7 @@ spec:
       containers:
       - name: mysql
         # Dev TODO: add your project id here
-        image: gcr.io/PROJECT-ID/mysql:latest
+        image: gcr.io/PROJECT_ID/mysql:latest
         env:
           - name: MYSQL_ROOT_PASSWORD
             value: "password"
