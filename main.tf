@@ -34,9 +34,11 @@ resource "google_compute_instance" "default" {
   // TODO: bake an image where all this is already done
   metadata = {
     startup-script = <<-SCRIPT
-    gsutil cp 'gs://sandbox-integration-testing-misc/microk8s_v1.11.7_amd64.snap' ./microk8s.snap
-    chmod +x ./microk8s.snap
-    snap install microk8s.snap --classic --dangerous
+    snap install microk8s --classic
+    # Patch microk8s configuration so we can connect from the outside
+    # This is not a good practice, use it only for the purpose of this lab
+    sed -i.sed-bak "s/127\.0\.0\.1/0.0.0.0/" /var/snap/microk8s/current/args/kube-apiserver
+    systemclt restart snap.microk8s.daemon-apiserver.service
     microk8s.status --wait-ready
     microk8s.enable dns
     microk8s.status --wait-ready
