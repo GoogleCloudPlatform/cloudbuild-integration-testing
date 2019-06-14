@@ -29,7 +29,6 @@ resource "google_compute_instance" "default" {
 
   // startup:
   // 1. install microk8s
-    // (using a custom microk8s; see https://github.com/GoogleCloudPlatform/cloudbuild-integration-testing/issues/36)
   // 2. program instance for self-deletion
   // TODO: bake an image where all this is already done
   metadata = {
