@@ -87,7 +87,7 @@ gcloud builds submit --config cloudbuild.gke-per-test.yaml .
 
 Before beginning, update k8s/db.yaml and k8s/web.yaml with your Project ID.
 
-### to do things locally:
+### To do things locally:
 ```
 # run terraform to create a self-destructing VM w/ microk8s
 terraform apply -var="project-name=$(gcloud config get-value project 2> /dev/null)" -var="instance-name=test-$(date +%s)" -auto-approve
@@ -107,8 +107,22 @@ kubectl apply -f ./k8s --kubeconfig=kubeconfig.microk8s
 kubectl get services --kubeconfig=kubeconfig.microk8s
 ```
 
-### to do things in Cloud Build:
-(prerequisite: terraform builder is built and pushed to GCR in project)
+### To do things in Cloud Build:
+
+#### Prerequisites
+
+1. Build the [Terraform community builder](https://github.com/GoogleCloudPlatform/cloud-builders-community/tree/master/terraform) and push to [Google Container Registry](https://cloud.google.com/container-registry/) in your GCP project
+
+2. Add Compute Instance Admin IAM role to Cloud Build Service Account
+
+    ```
+    gcloud projects add-iam-policy-binding <PROJECT-ID> \ 
+    --member serviceAccount:<PROJECT-NUMBER>@cloudbuild.gserviceaccount.com \
+    --role roles/compute.instanceAdmin
+    ```
+
+#### Running Build
+
 ```
 gcloud builds submit --config=cloudbuild.vm.yaml .
 ```
