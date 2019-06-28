@@ -49,6 +49,10 @@ gcloud builds submit --config=cloudbuild.compose.yaml .
     gcloud projects add-iam-policy-binding <PROJECT-ID> \ 
     --member serviceAccount:<PROJECT-NUMBER>@cloudbuild.gserviceaccount.com \
     --role roles/container.admin
+    
+    gcloud projects add-iam-policy-binding <PROJECT-ID> \ 
+    --member serviceAccount:<PROJECT-NUMBER>@cloudbuild.gserviceaccount.com \
+    --role roles/iam.serviceAccountUser
     ```
 
     Learn more about the [Cloud Build Service Account](https://cloud.google.com/cloud-build/docs/securing-builds/set-service-account-permissions#what_is_the_service_account), [Kubernetes Engine Permissions](https://cloud.google.com/kubernetes-engine/docs/how-to/iam) and [Granting Roles to Service Accounts](https://cloud.google.com/iam/docs/granting-roles-to-service-accounts#granting_access_to_a_service_account_for_a_resource).
