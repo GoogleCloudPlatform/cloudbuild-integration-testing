@@ -1,0 +1,10 @@
+# vanilla Ubuntu podspec
+
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ['cat']
+    tty: true

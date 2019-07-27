@@ -1,0 +1,1 @@
+# Alternative build config for Jenkins
