@@ -62,6 +62,26 @@ pipeline {
                         }
                     }
                 }
+                stage('wedbb') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'ubuntupod'
+                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                        }
+                    }
+                    steps {
+                        container('ubuntu') {
+                            sh "echo building db"
+                        }
+                        container('ubuntu') {
+                            sh "echo testing db"
+                        }
+                        container('ubuntu') {
+                            sh "echo pushing db to registry"
+                        }
+                    }
+                }
             }
         }
     }
