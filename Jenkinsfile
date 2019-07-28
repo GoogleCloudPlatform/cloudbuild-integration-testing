@@ -12,6 +12,7 @@
             - deploy --> int test --> deprovision[?]
         - dedicated cluster
             - deploy --> int test --> deprovision[?]
+
 */
 
 pipeline {
