@@ -1,7 +1,7 @@
 /*
     execution plan:
     1. [parallel] Build, test, push Containers
-        - web
+        - web √
         - db
     2. [parallel] provision and test
         - docker-compose[?]
@@ -31,8 +31,8 @@ pipeline {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'buld-web-pod'
-                            yamlFile 'jenkins/podspecs/build-web.yaml'
+                            label 'buld-pod-web'
+                            yamlFile 'jenkins/podspecs/build.yaml'
                         }
                     }
                     environment {
@@ -60,19 +60,21 @@ pipeline {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'ubuntupod'
-                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                            label 'build-pod-db'
+                            yamlFile 'jenkins/podspecs/build.yaml'
                         }
                     }
                     steps {
-                        container('ubuntu') {
-                            sh "echo building db"
-                        }
-                        container('ubuntu') {
-                            sh "echo testing db"
-                        }
-                        container('ubuntu') {
-                            sh "echo pushing db to registry"
+                        container(name: 'kaniko', shell: '/busybox/sh') {
+
+                            sh '''#!/busybox/sh
+                            pwd
+                            echo "---"
+                            ls -l
+                            echo "---"
+                            ls -l /
+                            # /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE_WEB}"
+                            '''
                         }
                     }
                 }
