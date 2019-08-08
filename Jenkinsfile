@@ -45,7 +45,10 @@ pipeline {
                             sh "echo testing web"
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
-                            sh "echo pushing web to registry"
+                            sh '''#!/busybox/sh
+                            # /kaniko/executor -f `pwd`/gke/Dockerfile -c `pwd` --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT}" --destination="${GCR_IMAGE}" --build-arg JAR_FILE="${APP_JAR}"
+                            echo container build and push
+                            '''
                         }
                     }
                 }
