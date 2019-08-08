@@ -41,10 +41,12 @@ pipeline {
       	            }
                     steps {
                         container('node') {
-                            sh "npm install"
-                            sh "npm test"
-                            // stash built app
-                            // TODO 
+                            dir("web") {
+                                sh "npm install"
+                                sh "npm test"
+                                // stash built app
+                                // TODO 
+                            }
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
                             sh '''#!/busybox/sh
