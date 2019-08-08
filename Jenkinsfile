@@ -51,7 +51,7 @@ pipeline {
                             }
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
-                            sh '''#!/busybox/sh
+                            sh '''#!/busybox/sh 
                             /kaniko/executor -f `pwd`/jenkins/dockerfiles/web.Dockerfile --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE_WEB}"
                             '''
                         }
