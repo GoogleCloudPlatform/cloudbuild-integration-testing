@@ -8,6 +8,9 @@ spec:
     image: node:10
     command: ['cat']
     tty: true
+    volumeMounts:
+      - name: workspace
+        mountPath: '/workspace'
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug-539ddefcae3fd6b411a95982a830d987f4214251
     imagePullPolicy: Always
@@ -17,6 +20,8 @@ spec:
     volumeMounts:
       - name: kaniko-secret
         mountPath: /secret
+      - name: workspace
+        mountPath: '/workspace'
     env:
       - name: GOOGLE_APPLICATION_CREDENTIALS
         value: /secret/kaniko-secret.json
@@ -24,3 +29,5 @@ spec:
   - name: kaniko-secret
     secret:
       secretName: kaniko-secret
+  - name: workspace
+    emptyDir: {}
