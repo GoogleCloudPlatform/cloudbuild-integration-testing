@@ -22,6 +22,7 @@ pipeline {
         PROJECT = "${JENKINS_TEST_PROJECT}"
         BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
+        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${BUILD_ID}"
     }
 
     stages {
@@ -73,7 +74,7 @@ pipeline {
                             ls -l
                             echo "---"
                             ls -l /
-                            # /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE_WEB}"
+                            # /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --destination="${GCR_IMAGE_DB}"
                             '''
                         }
                     }
