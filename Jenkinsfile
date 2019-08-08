@@ -26,43 +26,30 @@ pipeline {
     }
 
     stages {
-        // stage("echo") {
-    	//     agent {
-    	//     	kubernetes {
-      	// 	    cloud 'kubernetes'
-      	// 	    label 'ubuntupod'
-      	// 	    yamlFile 'jenkins/podspecs/ubuntu.yaml'
-		//         }
-	    //     }
-	    //     steps {
-	    // 	    container('ubuntu') {
-        //               sh "echo hello"
-		//        }
-		//    }
-	    // }
-        stage('build and test containers'){
+        stage('build and push containers'){
             parallel {
                 stage('web') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'ubuntupod'
-                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                            label 'buld-web-pod'
+                            yamlFile 'jenkins/podspecs/buld-web.yaml'
                         }
                     }
+                    environment {
+                        PATH = "/busybox:/kaniko:$PATH"
+      	            }
                     steps {
-                        container('ubuntu') {
+                        container('node') {
                             sh "echo building web"
-                        }
-                        container('ubuntu') {
                             sh "echo testing web"
                         }
-                        container('ubuntu') {
+                        container(name: 'kaniko', shell: '/busybox/sh') {
                             sh "echo pushing web to registry"
                         }
                     }
                 }
-                stage('wedbb') {
+                stage('db') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
