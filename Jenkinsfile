@@ -33,7 +33,7 @@ pipeline {
                         kubernetes {
                             cloud 'kubernetes'
                             label 'buld-web-pod'
-                            yamlFile 'jenkins/podspecs/buld-web.yaml'
+                            yamlFile '/jenkins/podspecs/buld-web.yaml'
                         }
                     }
                     environment {
