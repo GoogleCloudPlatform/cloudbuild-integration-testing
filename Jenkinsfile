@@ -23,6 +23,7 @@ pipeline {
 
     environment {
         BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
+        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
     }
 
     stages {
@@ -52,8 +53,7 @@ pipeline {
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
                             sh '''#!/busybox/sh
-                            # /kaniko/executor -f `pwd`/gke/Dockerfile -c `pwd` --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE}"
-                            echo container build and push
+                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/web.Dockerfile --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE_WEB}"
                             '''
                         }
                     }
