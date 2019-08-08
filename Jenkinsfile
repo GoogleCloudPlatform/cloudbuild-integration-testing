@@ -17,9 +17,6 @@
 
 pipeline {
     agent none
-    triggers {
-        cron('H/15 * * * *')
-    }
 
     environment {
         PROJECT = "${JENKINS_TEST_PROJECT}"
