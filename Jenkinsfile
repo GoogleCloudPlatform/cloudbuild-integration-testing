@@ -22,7 +22,7 @@ pipeline {
     }
 
     environment {
-        FOO = "bar"
+        BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
     }
 
     stages {
@@ -45,13 +45,13 @@ pipeline {
                                 sh "npm install"
                                 sh "npm test"
                                 // stash built app to GCS
-                                sh "tar --exclude='./.git' -zcvf $BUILD_CONTEXT ."
-                                step([$class: 'ClassicUploadStep', credentialsId: env.JENKINS_TEST_CRED_ID, bucket: "gs://${JENKINS_TEST_BUCKET}", pattern: "env.BUILD_CONTEXT"])
+                                sh "tar --exclude='./.git' -zcvf $BUILD_CONTEXT_WEB ."
+                                step([$class: 'ClassicUploadStep', credentialsId: env.JENKINS_TEST_CRED_ID, bucket: "gs://${JENKINS_TEST_BUCKET}", pattern: "env.BUILD_CONTEXT_WEB"])
                             }
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
                             sh '''#!/busybox/sh
-                            # /kaniko/executor -f `pwd`/gke/Dockerfile -c `pwd` --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT}" --destination="${GCR_IMAGE}" --build-arg JAR_FILE="${APP_JAR}"
+                            # /kaniko/executor -f `pwd`/gke/Dockerfile -c `pwd` --context="gs://${JENKINS_TEST_BUCKET}/${BUILD_CONTEXT_WEB}" --destination="${GCR_IMAGE}"
                             echo container build and push
                             '''
                         }
