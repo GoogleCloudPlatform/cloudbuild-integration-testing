@@ -22,6 +22,7 @@ pipeline {
     }
 
     environment {
+        PROJECT = "${JENKINS_TEST_PROJECT}"
         BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
     }
