@@ -69,12 +69,12 @@ pipeline {
                         container(name: 'kaniko', shell: '/busybox/sh') {
 
                             sh '''#!/busybox/sh
-                            pwd
-                            echo "---"
-                            ls -l
-                            echo "---"
-                            ls -l /
-                            # /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --destination="${GCR_IMAGE_DB}"
+                            # pwd
+                            # echo "---"
+                            # ls -l
+                            # echo "---"
+                            # ls -l /
+                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --destination="${GCR_IMAGE_DB}"
                             '''
                         }
                     }
