@@ -44,8 +44,9 @@ pipeline {
                             dir("web") {
                                 sh "npm install"
                                 sh "npm test"
-                                // stash built app
-                                // TODO 
+                                // stash built app to GCS
+                                sh "tar --exclude='./.git' -zcvf $BUILD_CONTEXT ."
+                                step([$class: 'ClassicUploadStep', credentialsId: env.JENKINS_TEST_CRED_ID, bucket: "gs://${JENKINS_TEST_BUCKET}", pattern: "env.BUILD_CONTEXT"])
                             }
                         }
                         container(name: 'kaniko', shell: '/busybox/sh') {
