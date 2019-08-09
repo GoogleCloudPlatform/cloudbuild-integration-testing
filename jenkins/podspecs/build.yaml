@@ -8,14 +8,13 @@ spec:
     image: node:10
     command: ['cat']
     tty: true
-    volumeMounts:
-      - name: workspace
-        mountPath: '/workspace'
+    # volumeMounts:
+    #   - name: workspace
+    #     mountPath: '/workspace'
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
-    command:
-    - /busybox/cat
+    command: ['/busybox/cat']
     tty: true
     volumeMounts:
       - name: kaniko-secret
