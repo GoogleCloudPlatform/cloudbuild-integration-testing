@@ -28,20 +28,6 @@ pipeline {
     stages {
         stage('build and push containers'){
             parallel {
-                stage('test') {
-                    agent {
-                        kubernetes{
-                            cloud 'kubernetes'
-                            label 'build-pod-dummy'
-                            yamlFile 'jenkins/podspecs/build.yaml'
-                        }
-                    }
-                    steps {
-                        container('node') {
-                            sh "echo hi from node"
-                        }
-                    }
-                }
                 stage('web') {
                     agent {
                         kubernetes {
@@ -71,23 +57,23 @@ pipeline {
                         }
                     }
                 }
-                // stage('db') {
-                //     agent {
-                //         kubernetes {
-                //             cloud 'kubernetes'
-                //             label 'build-pod-db'
-                //             yamlFile 'jenkins/podspecs/build.yaml'
-                //         }
-                //     }
-                //     steps {
-                //         container(name: 'kaniko', shell: '/busybox/sh') {
+                stage('db') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'build-pod-db'
+                            yamlFile 'jenkins/podspecs/build.yaml'
+                        }
+                    }
+                    steps {
+                        container(name: 'kaniko', shell: '/busybox/sh') {
 
-                //             sh '''#!/busybox/sh
-                //             /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --context="dir://`pwd`/mysql" --destination="${GCR_IMAGE_DB}"
-                //             '''
-                //         }
-                //     }
-                // }
+                            sh '''#!/busybox/sh
+                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --context="dir://`pwd`/mysql" --destination="${GCR_IMAGE_DB}"
+                            '''
+                        }
+                    }
+                }
             }
         }
     }
