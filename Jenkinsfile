@@ -69,7 +69,7 @@ pipeline {
                         container(name: 'kaniko', shell: '/busybox/sh') {
 
                             sh '''#!/busybox/sh
-                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --destination="${GCR_IMAGE_DB}"
+                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --context=dir://`pwd`/mysql --destination="${GCR_IMAGE_DB}"
                             '''
                         }
                     }
