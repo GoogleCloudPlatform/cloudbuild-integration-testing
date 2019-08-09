@@ -12,11 +12,7 @@ spec:
       - name: workspace
         mountPath: '/workspace'
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug-539ddefcae3fd6b411a95982a830d987f4214251
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
+    image: gcr.io/kaniko-project/executor:v0.10.0
     volumeMounts:
       - name: kaniko-secret
         mountPath: /secret
@@ -25,6 +21,7 @@ spec:
     env:
       - name: GOOGLE_APPLICATION_CREDENTIALS
         value: /secret/kaniko-secret.json
+  restartPolicy: Never
   volumes:
   - name: kaniko-secret
     secret:
