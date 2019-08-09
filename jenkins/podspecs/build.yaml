@@ -15,11 +15,11 @@ spec:
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
     command:
-      - /busybox/cat
+    - /busybox/cat
     tty: true
-    # volumeMounts:
-    #   - name: kaniko-secret
-    #     mountPath: /secret
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /secret
     #   - name: workspace
     #     mountPath: '/workspace'
     # env:
