@@ -69,7 +69,7 @@ pipeline {
                         container(name: 'kaniko', shell: '/busybox/sh') {
 
                             sh '''#!/busybox/sh
-                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/mysql.Dockerfile --no-push
+                            /kaniko/executor -f `pwd`/jenkins/dockerfiles/hello-world.Dockerfile --no-push
                             '''
                         }
                     }
