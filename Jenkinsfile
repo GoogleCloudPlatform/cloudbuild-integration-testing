@@ -45,7 +45,7 @@ pipeline {
                                 sh "npm install"
                                 sh "npm test"
                                 // stash built app to GCS
-                                sh "tar --exclude='./.git' -zcvf /tmp/$BUILD_CONTEXT_WEB ." // save to tmp to avoid 'file changed as we read it'
+                                sh "tar --exclude='./.git' -zcf /tmp/$BUILD_CONTEXT_WEB ." // save to tmp to avoid 'file changed as we read it'
                                 sh "mv /tmp/$BUILD_CONTEXT_WEB ." // bubble from tmp
                                 step([$class: 'ClassicUploadStep', credentialsId: env.JENKINS_TEST_CRED_ID, bucket: "gs://${JENKINS_TEST_BUCKET}", pattern: env.BUILD_CONTEXT_WEB])
                             }
