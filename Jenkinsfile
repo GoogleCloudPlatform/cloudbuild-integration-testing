@@ -93,20 +93,6 @@ pipeline {
         }
         stage('integration tests'){
             parallel {
-                stage('provision namespace on staging') {
-                    agent {
-                        kubernetes {
-                            cloud 'kubernetes'
-                            label 'deploy-gke'
-                            yamlFile 'jenkins/podspecs/deploy.yaml'
-                        }
-                    }
-                    steps {
-                        container('jenkins-gke') {
-                            sh("echo hi")
-                        }
-                    }
-                }
                 stage('gke') {
                     agent {
                         kubernetes {
@@ -115,21 +101,27 @@ pipeline {
                             yamlFile 'jenkins/podspecs/deploy.yaml'
                         }
                     }
-                    steps {
-                        container('jenkins-gke') { // create namespace
-                            sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
-                            sh('cat jenkins/manifests/create-namespace.yaml')
-                            step([
-                                $class: 'KubernetesEngineBuilder',
-                                projectId: env.PROJECT_ID,
-                                clusterName: env.CLUSTER_NAME_STAGING,
-                                location: env.LOCATION,
-                                manifestPattern: 'jenkins/manifests/create-namespace.yaml',
-                                credentialsId: env.CREDENTIALS_ID,
-                                verifyDeployments: true])
+                    stage('provision namespace on gke') {
+                        steps {
+                            container('jenkins-gke') { // create namespace
+                                sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
+                                sh('cat jenkins/manifests/create-namespace.yaml')
+                                step([
+                                    $class: 'KubernetesEngineBuilder',
+                                    projectId: env.PROJECT_ID,
+                                    clusterName: env.CLUSTER_NAME_STAGING,
+                                    location: env.LOCATION,
+                                    manifestPattern: 'jenkins/manifests/create-namespace.yaml',
+                                    credentialsId: env.CREDENTIALS_ID,
+                                    verifyDeployments: true])
+                            }
                         }
-                        container('jenkins-gke') {
-                            sh('echo test on gke namespace')
+                    }
+                    stage('deploy application') {
+                        steps {
+                            container('jenkins-gke') {
+                                sh('echo test on gke namespace')
+                            }
                         }
                     }
                 }
