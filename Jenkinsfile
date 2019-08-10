@@ -128,13 +128,13 @@ pipeline {
                             }
                         }
                         container('jenkins-gke') { // create namespace
-                            sh("cp /workspace/_kustomized.yaml /")
+                            sh("cp /workspace/_kustomized.yaml .")
                             step([
                                 $class: 'KubernetesEngineBuilder',
                                 projectId: env.PROJECT_ID,
                                 clusterName: env.CLUSTER_NAME_STAGING,
                                 location: env.LOCATION,
-                                manifestPattern: '/_kustomized.yaml',
+                                manifestPattern: '_kustomized.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: true])
                         }
