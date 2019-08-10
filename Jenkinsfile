@@ -43,7 +43,26 @@ pipeline {
 stages {
         stage('test'){
             parallel {
-                stage('web') {
+                stage('1') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'buld-pod-web'
+                            yamlFile 'jenkins/podspecs/build.yaml'
+                        }
+                    }
+                    environment {
+                        PATH = "/busybox:/kaniko:$PATH"
+      	            }
+                    steps {
+                        container('node') {
+                            dir("web") {
+                                sh "echo hi"
+                            }
+                        }
+                    }
+                }
+                stage('2') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
