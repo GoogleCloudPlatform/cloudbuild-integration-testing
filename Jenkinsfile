@@ -93,6 +93,20 @@ pipeline {
         }
         stage('integration tests'){
             parallel {
+                stage('provision namespace on staging') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'deploy-gke'
+                            yamlFile 'jenkins/podspecs/deploy.yaml'
+                        }
+                    }
+                    steps {
+                        container('jenkins-gke') {
+                            sh("echo hi")
+                        }
+                    }
+                }
                 stage('gke') {
                     agent {
                         kubernetes {
