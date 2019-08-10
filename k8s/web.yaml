@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: __IMAGE_WEB__
+        image: __IMAGE-WEB__
         env:
         - name: DB_HOST
           value: cookieshop-db
