@@ -108,7 +108,7 @@ pipeline {
                             step([
                                 $class: 'KubernetesEngineBuilder',
                                 projectId: env.PROJECT_ID,
-                                clusterName: env.CLUSTER_NAME,
+                                clusterName: env.CLUSTER_NAME_STAGING,
                                 location: env.LOCATION,
                                 manifestPattern: 'jenkins/manifests/create-namespace.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
