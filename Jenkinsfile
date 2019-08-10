@@ -40,52 +40,6 @@ pipeline {
         STAGING_NAMESPACE = "test-jenkins-${BUILD_ID}"
     }
 
-stages {
-        stage('test'){
-            parallel {
-                stage('1') {
-                    agent {
-                        kubernetes {
-                            cloud 'kubernetes'
-                            label 'buld-pod-web-1'
-                            yamlFile 'jenkins/podspecs/build.yaml'
-                        }
-                    }
-                    environment {
-                        PATH = "/busybox:/kaniko:$PATH"
-      	            }
-                    steps {
-                        container('node') {
-                            dir("web") {
-                                sh "echo hi"
-                            }
-                        }
-                    }
-                }
-                stage('2') {
-                    agent {
-                        kubernetes {
-                            cloud 'kubernetes'
-                            label 'buld-pod-web-2'
-                            yamlFile 'jenkins/podspecs/build.yaml'
-                        }
-                    }
-                    environment {
-                        PATH = "/busybox:/kaniko:$PATH"
-      	            }
-                    steps {
-                        container('node') {
-                            dir("web") {
-                                sh "echo hi"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-}
-
-/*
     stages {
         stage('build and push containers'){
             parallel {
@@ -118,6 +72,10 @@ stages {
                         }
                     }
                 }
+            }
+        }
+    }
+    /*
                 stage('db') {
                     agent {
                         kubernetes {
