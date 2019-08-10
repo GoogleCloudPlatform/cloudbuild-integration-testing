@@ -102,7 +102,7 @@ pipeline {
                     }
                     steps {
                         container('jenkins-gke') {
-                            sh("sed -i 's#%%NAMESPACE%%#test-jenkins-${BUILD_ID}#' jenkins/manifests/create-namespace.yaml")
+                            sh("sed -i 's#__NAMESPACE__#test-jenkins-${BUILD_ID}#' jenkins/manifests/create-namespace.yaml")
                             sh('cat jenkins/manifests/create-namespace.yaml')
                         }
                         container('jenkins-gke') {
