@@ -19,10 +19,24 @@ pipeline {
     agent none
 
     environment {
+        // globals: these should be defined in Jenkins global config
+        // JENKINS_TEST_PROJECT (GCP project Jenkins runs in)
+        // JENKINS_TEST_BUCKET (GCS bucket for saving intermediate artifacts)
+        // JENKINS_TEST_CRED_ID (name of GCP credential for Jenkins service acct)
+
+        // different steps use different names for this
         PROJECT = "${JENKINS_TEST_PROJECT}"
+        PROJECT_ID = "${PROJECT}"
+
+        // build vars
         BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
         GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${BUILD_ID}"
+
+        // deploy vars
+        CLUSTER_NAME_STAGING = "cookieshop-staging"
+        LOCATION = "us-central1-a"
+        CREDENTIALS_ID = "${JENKINS_TEST_CRED_ID}"
     }
 
     stages {
