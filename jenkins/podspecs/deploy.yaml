@@ -13,6 +13,11 @@ spec:
     volumeMounts:
       - name: workspace
         mountPath: /workspace
+  - name: kustomize
+    image: bitlayer/kustomize:v2.1.0
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
   restartPolicy: Never
   volumes:
   - name: workspace
