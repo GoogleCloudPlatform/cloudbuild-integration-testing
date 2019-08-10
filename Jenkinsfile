@@ -37,6 +37,7 @@ pipeline {
         CLUSTER_NAME_STAGING = "cookieshop-staging"
         LOCATION = "us-central1-a"
         CREDENTIALS_ID = "${JENKINS_TEST_CRED_ID}"
+        STAGING_NAMESPACE = "test-jenkins-${BUILD_ID}"
     }
 
     stages {
@@ -101,9 +102,17 @@ pipeline {
                         }
                     }
                     steps {
-                        container('jenkins-gke') {
-                            sh("sed -i 's#__NAMESPACE__#test-jenkins-${BUILD_ID}#' jenkins/manifests/create-namespace.yaml")
+                        container('jenkins-gke') { // create namespace
+                            sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
                             sh('cat jenkins/manifests/create-namespace.yaml')
+                            step([
+                                $class: 'KubernetesEngineBuilder',
+                                projectId: env.PROJECT_ID,
+                                clusterName: env.CLUSTER_NAME,
+                                location: env.LOCATION,
+                                manifestPattern: 'jenkins/manifests/create-namespace.yaml',
+                                credentialsId: env.CREDENTIALS_ID,
+                                verifyDeployments: true])
                         }
                         container('jenkins-gke') {
                             sh('echo test on gke namespace')
