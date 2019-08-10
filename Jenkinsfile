@@ -91,14 +91,9 @@ pipeline {
                 }
             }
         }
-    }
-    /*
-                
-            }
-        }
-        stage('integration tests'){
+        stage('integration tests') {
             parallel {
-                stage('gke') {
+                stage('gke staging') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
@@ -118,17 +113,12 @@ pipeline {
                                 manifestPattern: 'jenkins/manifests/create-namespace.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: true])
+                            // deploy app
                         }
-                    }
-                    stage('deploy application') {
-                        steps {
-                            container('jenkins-gke') {
-                                sh('echo test on gke namespace')
-                            }
-                        }
+                        // test app
                     }
                 }
-                stage('gke-per-test') {
+                stage('gke per test') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
@@ -148,5 +138,4 @@ pipeline {
             }
         }
     }
-    */
 }
