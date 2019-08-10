@@ -122,7 +122,7 @@ pipeline {
                                     kustomize edit set namespace ${STAGING_NAMESPACE}
                                     kustomize build . > /workspace/_kustomized.yaml
                                     # debug
-                                    cat _kustomized.yaml
+                                    cat /workspace/_kustomized.yaml
 
                                 '''
                             }
