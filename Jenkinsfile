@@ -113,7 +113,15 @@ pipeline {
                                 manifestPattern: 'jenkins/manifests/create-namespace.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: true])
-                            sh("kubectl version")
+                        }
+                        container('kustomize') { // TODO: move this to a step between build and deploy
+                            sh '''
+                                kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
+                                kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
+                                kustomize build k8s/ _kustomized.yaml
+                                # debug
+                                cat _kustomized.yaml 
+                            '''
                         }
                         // test app
                     }
