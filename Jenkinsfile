@@ -76,5 +76,43 @@ pipeline {
                 }
             }
         }
+        stage('integration tests'){
+            parallel {
+                stage('gke') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'ubuntu-gke'
+                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                        }
+                    }
+                    steps {
+                        container('ubuntu') {
+                            sh('echo prepare gke namespace')
+                        }
+                        container('ubuntu') {
+                            sh('echo test on gke namespace')
+                        }
+                    }
+                }
+                stage('gke-per-test') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'ubuntu-gke-per-test'
+                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                        }
+                    }
+                    steps {
+                        container('ubuntu') {
+                            sh('echo dedicated gke')
+                        }
+                        container('ubuntu') {
+                            sh('echo test dedicated gke')
+                        }
+                    }
+                }
+            }
+        }
     }
 }
