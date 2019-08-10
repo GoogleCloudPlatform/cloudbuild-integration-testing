@@ -120,11 +120,22 @@ pipeline {
                                     kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
                                     kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
                                     kustomize edit set namespace ${STAGING_NAMESPACE}
-                                    kustomize build . > _kustomized.yaml
+                                    kustomize build . > /workspace/_kustomized.yaml
                                     # debug
                                     cat _kustomized.yaml
+
                                 '''
                             }
+                        }
+                        container('jenkins-gke') { // create namespace
+                            step([
+                                $class: 'KubernetesEngineBuilder',
+                                projectId: env.PROJECT_ID,
+                                clusterName: env.CLUSTER_NAME_STAGING,
+                                location: env.LOCATION,
+                                manifestPattern: '/workspace/_kustomized.yaml',
+                                credentialsId: env.CREDENTIALS_ID,
+                                verifyDeployments: true])
                         }
                         // test app
                     }
