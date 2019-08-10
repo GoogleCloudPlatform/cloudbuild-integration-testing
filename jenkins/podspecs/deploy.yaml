@@ -2,8 +2,8 @@
 
 apiVersion: v1
 kind: Pod
-# metadata:
-#   name: deploy-pod
+metadata:
+  name: deploy-pod
 spec:
   containers:
   - name: jenkins-gke
@@ -20,5 +20,5 @@ spec:
         mountPath: /workspace
   restartPolicy: Never
   volumes:
-  - name: workspace
-    emptyDir: {}
+    - name: workspace
+      emptyDir: {}
