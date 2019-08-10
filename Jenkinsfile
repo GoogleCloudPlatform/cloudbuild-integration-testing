@@ -101,20 +101,18 @@ pipeline {
                             yamlFile 'jenkins/podspecs/deploy.yaml'
                         }
                     }
-                    stage('provision namespace on gke') {
-                        steps {
-                            container('jenkins-gke') { // create namespace
-                                sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
-                                sh('cat jenkins/manifests/create-namespace.yaml')
-                                step([
-                                    $class: 'KubernetesEngineBuilder',
-                                    projectId: env.PROJECT_ID,
-                                    clusterName: env.CLUSTER_NAME_STAGING,
-                                    location: env.LOCATION,
-                                    manifestPattern: 'jenkins/manifests/create-namespace.yaml',
-                                    credentialsId: env.CREDENTIALS_ID,
-                                    verifyDeployments: true])
-                            }
+                    steps {
+                        container('jenkins-gke') { // create namespace
+                            sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
+                            sh('cat jenkins/manifests/create-namespace.yaml')
+                            step([
+                                $class: 'KubernetesEngineBuilder',
+                                projectId: env.PROJECT_ID,
+                                clusterName: env.CLUSTER_NAME,
+                                location: env.LOCATION,
+                                manifestPattern: 'jenkins/manifests/create-namespace.yaml',
+                                credentialsId: env.CREDENTIALS_ID,
+                                verifyDeployments: true])
                         }
                     }
                     stage('deploy application') {
