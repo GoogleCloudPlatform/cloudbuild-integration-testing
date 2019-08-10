@@ -1,0 +1,19 @@
+# pod for provisioning and deploying test infra
+
+apiVersion: v1
+kind: Pod
+# metadata:
+#   name: deploy-pod
+spec:
+  containers:
+  - name: jenkins-gke
+    image: gcr.io/jenkins-gke-plugin/jenkinsagent
+    command: ['cat']
+    tty: true
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
+  restartPolicy: Never
+  volumes:
+  - name: workspace
+    emptyDir: {}

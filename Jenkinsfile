@@ -96,15 +96,16 @@ pipeline {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'ubuntu-gke'
-                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                            label 'deploy-gke'
+                            yamlFile 'jenkins/podspecs/deploy.yaml'
                         }
                     }
                     steps {
-                        container('ubuntu') {
-                            sh('echo prepare gke namespace')
+                        container('jenkins-gke') {
+                            sh('sed -i 's/%%NAMESPACE%%/test-jenkins-${BUILD_ID}/g' jenkins/manifests/create-namespace.yaml')
+                            sh('cat jenkins/manifests/create-namespace.yaml')
                         }
-                        container('ubuntu') {
+                        container('jenkins-gke') {
                             sh('echo test on gke namespace')
                         }
                     }

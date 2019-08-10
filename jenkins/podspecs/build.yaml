@@ -1,4 +1,4 @@
-# pod for build, test, dockerize of Node web app
+# pod for build, test, containerize of services
 
 apiVersion: v1
 kind: Pod
