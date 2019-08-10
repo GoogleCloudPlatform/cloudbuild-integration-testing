@@ -115,13 +115,15 @@ pipeline {
                                 verifyDeployments: true])
                         }
                         container('kustomize') { // TODO: move this to a step between build and deploy
-                            sh '''
-                                kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
-                                kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
-                                kustomize build k8s/ _kustomized.yaml
-                                # debug
-                                cat _kustomized.yaml 
-                            '''
+                            dir('k8s') {
+                                sh '''
+                                    kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
+                                    kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
+                                    kustomize build . _kustomized.yaml
+                                    # debug
+                                    cat _kustomized.yaml 
+                                '''
+                            }
                         }
                         // test app
                     }
