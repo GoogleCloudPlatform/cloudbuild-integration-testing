@@ -72,10 +72,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-    }
-    /*
                 stage('db') {
                     agent {
                         kubernetes {
@@ -93,6 +89,11 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+    }
+    /*
+                
             }
         }
         stage('integration tests'){
