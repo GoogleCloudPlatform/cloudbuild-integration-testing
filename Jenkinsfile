@@ -47,7 +47,7 @@ stages {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'buld-pod-web'
+                            label 'buld-pod-web-1'
                             yamlFile 'jenkins/podspecs/build.yaml'
                         }
                     }
@@ -66,7 +66,7 @@ stages {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'buld-pod-web'
+                            label 'buld-pod-web-2'
                             yamlFile 'jenkins/podspecs/build.yaml'
                         }
                     }
