@@ -136,7 +136,8 @@ pipeline {
                                 location: env.LOCATION,
                                 manifestPattern: '_kustomized.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
-                                verifyDeployments: true])
+                                // verifyDeployments: true
+                                ])
                         }
                         // test app
                     }
