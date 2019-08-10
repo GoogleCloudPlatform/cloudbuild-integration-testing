@@ -130,8 +130,8 @@ pipeline {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
-                            label 'ubuntu-gke-per-test'
-                            yamlFile 'jenkins/podspecs/ubuntu.yaml'
+                            label 'deploy-gke-per-test'
+                            yamlFile 'jenkins/podspecs/deploy.yaml'
                         }
                     }
                     steps {
