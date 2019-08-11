@@ -137,11 +137,13 @@ pipeline {
                                 chmod 755 /workspace/kubeconfig
                                 ''')
                         }
-                        container('jenkins-gke') { // create namespace
-                            sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
-                        }
-                        container('jenkins-gke') { // deploy app
+                        container('jenkins-gke') { 
                             unstash 'kustomize'
+
+                            // create namespace
+                            sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
+                            
+                            // deploy app
                             step([
                                 $class: 'KubernetesEngineBuilder',
                                 projectId: env.PROJECT_ID,
@@ -151,22 +153,18 @@ pipeline {
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: false
                                 ])
-                        }
-                        container('jenkins-gke') {
+
                             // determine URL of the deployed app and store to /workspace/_app-url
                             sh 'jenkins/util/get-app-url.sh'
-                        }
                         
-                        container('gcloud') {
                             // test connectivity to and content of application
                             sh('''
                                 ### -r = retries; -i = interval; -k = keyword to search for ###
                                 test/test-connection.sh -r 20 -i 3 -u $(cat /workspace/_app-url)
                                 test/test-content.sh -r 20 -i 3 -u $(cat /workspace/_app-url) -k 'Chocolate Chip'
                             ''')
-                        }
-                        
-                        container('jenkins-gke') { // delete namespace (and all contents)
+                            
+                            // delete namespace (and all contents)
                             sh("kubectl delete namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
                         }
                     }
