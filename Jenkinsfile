@@ -127,18 +127,18 @@ pipeline {
                         }
                     }
                     steps {
-                        container('jenkins-gke') { // create namespace
-                            sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
-                            // sh('cat jenkins/manifests/create-namespace.yaml')
-                            step([ // TODO: replace this with simple kubectl?
-                                $class: 'KubernetesEngineBuilder',
-                                projectId: env.PROJECT_ID,
-                                clusterName: env.CLUSTER_NAME_STAGING,
-                                location: env.LOCATION,
-                                manifestPattern: 'jenkins/manifests/create-namespace.yaml',
-                                credentialsId: env.CREDENTIALS_ID,
-                                verifyDeployments: true])
-                        }
+                        // container('jenkins-gke') { // create namespace
+                        //     sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
+                        //     // sh('cat jenkins/manifests/create-namespace.yaml')
+                        //     step([ // TODO: replace this with simple kubectl?
+                        //         $class: 'KubernetesEngineBuilder',
+                        //         projectId: env.PROJECT_ID,
+                        //         clusterName: env.CLUSTER_NAME_STAGING,
+                        //         location: env.LOCATION,
+                        //         manifestPattern: 'jenkins/manifests/create-namespace.yaml',
+                        //         credentialsId: env.CREDENTIALS_ID,
+                        //         verifyDeployments: true])
+                        // }
                         container('jenkins-gke') { // deploy app
                             unstash 'kustomize'
                             step([
