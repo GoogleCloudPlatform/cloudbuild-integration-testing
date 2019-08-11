@@ -138,7 +138,7 @@ pipeline {
                                 verifyDeployments: false
                                 ])
                         }
-                        container('gcloud') { // get endpoint
+                        container('jenins-gke') { // get endpoint
                             sh('''
                                 gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
 
