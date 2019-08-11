@@ -150,9 +150,15 @@ pipeline {
                             // store the URL of the deployed app to /workspace/_app-url
                             sh 'jenkins/util/get-app-url.sh'
                         }
-                        // TODO: test app
                         
-                        // 
+                        container('gcloud') {
+                            // test connectivity to and content of application
+                            sh('''
+                                ### -r = retries; -i = interval; -k = keyword to search for ###
+                                test/test-connection.sh -r 20 -i 3 -u $(< /workspace/_app-url)
+                                test/test-content.sh -r 20 -i 3 -u $(< /workspace/_app-url) -k 'Chocolate Chip'
+                            ''')
+                        }
                     }
                 }
                 stage('gke per test') {
