@@ -16,4 +16,6 @@ until [ -n "$(get_nodeip)" ]; do
     echo "querying for nodeip"
     sleep 3
 done
+
 echo "http://$(get_nodeip)/$(get_nodeport)" > /workspace/_app-url # save URL for use in next step
+chmod 755 /workspace/_app-url

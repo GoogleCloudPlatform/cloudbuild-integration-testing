@@ -155,8 +155,8 @@ pipeline {
                             // test connectivity to and content of application
                             sh('''
                                 ### -r = retries; -i = interval; -k = keyword to search for ###
-                                test/test-connection.sh -r 20 -i 3 -u $(< /workspace/_app-url)
-                                test/test-content.sh -r 20 -i 3 -u $(< /workspace/_app-url) -k 'Chocolate Chip'
+                                test/test-connection.sh -r 20 -i 3 -u $(cat /workspace/_app-url)
+                                test/test-content.sh -r 20 -i 3 -u $(cat /workspace/_app-url) -k 'Chocolate Chip'
                             ''')
                         }
                     }
