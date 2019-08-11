@@ -106,10 +106,12 @@ pipeline {
                             kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
                             kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
                             kustomize edit set namespace ${STAGING_NAMESPACE}
-                            kustomize build . > /workspace/_kustomized.yaml
+                            kustomize build . > _kustomized.yaml
+                            
                             # debug
-                            cat /workspace/_kustomized.yaml
+                            cat _kustomized.yaml
                         '''
+                        stash includes: '_kustomized.yaml', name: 'kustomize' // store hydrated manifest for use in deploy steps
                     }
                 }
             }
@@ -138,7 +140,7 @@ pipeline {
                                 verifyDeployments: true])
                         }
                         container('jenkins-gke') { // deploy app
-                            sh("cp /workspace/_kustomized.yaml .")
+                            unstash 'kustomize'
                             step([
                                 $class: 'KubernetesEngineBuilder',
                                 projectId: env.PROJECT_ID,
