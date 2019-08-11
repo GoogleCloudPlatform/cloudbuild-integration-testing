@@ -105,7 +105,7 @@ pipeline {
                         sh '''
                             kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
                             kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
-                            kustomize edit set namespace ${STAGING_NAMESPACE}
+                            kustomize edit set namespace __NAMESPACE__=${STAGING_NAMESPACE}
                             kustomize build . > _kustomized.yaml
                             
                             # debug
