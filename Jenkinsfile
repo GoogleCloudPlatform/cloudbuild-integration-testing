@@ -141,9 +141,7 @@ pipeline {
                         container('gcloud') { // get endpoint
                             sh('''
                                 gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
-                            ''')
-                            /*
-                            sh('''
+
                                 # get endpoint of deployed app (TODO: make this a reusable method)
                                 # get node port
                                 get_nodeport() {
