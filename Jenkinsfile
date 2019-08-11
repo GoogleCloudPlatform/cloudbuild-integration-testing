@@ -137,7 +137,12 @@ pipeline {
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: false
                                 ])
-                            // TODO: get endpoint
+                        }
+                        container('gcloud') { // get endpoint
+                            sh('''
+                                gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
+                            ''')
+                            /*
                             sh('''
                                 # get endpoint of deployed app (TODO: make this a reusable method)
                                 # get node port
@@ -151,6 +156,7 @@ pipeline {
                                 echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
                                 cat /workspace/_nodeport
                             ''')
+                            */
                         }
                         // TODO: test app
                         

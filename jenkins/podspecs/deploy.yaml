@@ -20,6 +20,13 @@ spec:
     volumeMounts:
       - name: workspace
         mountPath: /workspace
+  - name: gcloud
+    image: google/cloud-sdk:slim
+    command: ['cat']
+    tty: true
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
   restartPolicy: Never
   volumes:
     - name: workspace
