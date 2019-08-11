@@ -140,6 +140,7 @@ pipeline {
                         }
                         container('gcloud') { // auth to the cluster
                             sh('''
+                                gcloud config set container/use_application_default_credentials true
                                 gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
                                 cp ~/.kube/config /workspace/kubeconfig
                                 chmod 755 /workspace/kubeconfig
