@@ -153,7 +153,7 @@ pipeline {
                                 get_nodeport() {
                                     kubectl get service cookieshop-web --kubeconfig=/workspace/kubeconfig --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
                                 }
-                                until [[ -n "$(get_nodeport)" ]]; do
+                                until [ -n "$(get_nodeport)" ]; do
                                     echo "querying for nodeport"
                                     sleep 3
                                 done
