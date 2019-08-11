@@ -91,6 +91,29 @@ pipeline {
                 }
             }
         }
+        stage('write hydrated manifest') {
+            agent {
+                kubernetes {
+                    cloud 'kubernetes'
+                    label 'kustomize'
+                    yamlFile 'jenkins/podspecs/deploy.yaml'
+                }
+            }
+            steps {
+                container('kustomize') {
+                    dir('k8s') {
+                        sh '''
+                            kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
+                            kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
+                            kustomize edit set namespace ${STAGING_NAMESPACE}
+                            kustomize build . > /workspace/_kustomized.yaml
+                            # debug
+                            cat /workspace/_kustomized.yaml
+                        '''
+                    }
+                }
+            }
+        }
         stage('integration tests') {
             parallel {
                 stage('gke staging') {
@@ -114,19 +137,7 @@ pipeline {
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: true])
                         }
-                        container('kustomize') { // TODO: move this to a step between build and deploy
-                            dir('k8s') {
-                                sh '''
-                                    kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
-                                    kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
-                                    kustomize edit set namespace ${STAGING_NAMESPACE}
-                                    kustomize build . > /workspace/_kustomized.yaml
-                                    # debug
-                                    cat /workspace/_kustomized.yaml
-                                '''
-                            }
-                        }
-                        container('jenkins-gke') { // create namespace
+                        container('jenkins-gke') { // deploy app
                             sh("cp /workspace/_kustomized.yaml .")
                             step([
                                 $class: 'KubernetesEngineBuilder',
@@ -147,7 +158,7 @@ pipeline {
                                 ''')
                         }
                         container('jenkins-gke') {
-                            // store the URL of the deployed app to /workspace/_app-url
+                            // determine URL of the deployed app and store to /workspace/_app-url
                             sh 'jenkins/util/get-app-url.sh'
                         }
                         
