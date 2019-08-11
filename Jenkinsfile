@@ -138,11 +138,14 @@ pipeline {
                                 verifyDeployments: false
                                 ])
                         }
-                        container('gcloud') { // get endpoint
+                        container('gcloud') { // auth to the cluster
                             sh('''
                                 gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
                                 cp ~/.kube/config /workspace/kubeconfig
-
+                                ''')
+                        }
+                        container('jenkins-gke') {
+                            sh(''''
                                 # get endpoint of deployed app (TODO: make this a reusable method)
                                 # get node port
                                 get_nodeport() {
