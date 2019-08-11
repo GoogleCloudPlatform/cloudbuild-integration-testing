@@ -123,7 +123,6 @@ pipeline {
                                     kustomize build . > /workspace/_kustomized.yaml
                                     # debug
                                     cat /workspace/_kustomized.yaml
-
                                 '''
                             }
                         }
@@ -136,10 +135,13 @@ pipeline {
                                 location: env.LOCATION,
                                 manifestPattern: '_kustomized.yaml',
                                 credentialsId: env.CREDENTIALS_ID,
-                                // verifyDeployments: true
+                                verifyDeployments: true
                                 ])
+                            // TODO: get endpoint
                         }
-                        // test app
+                        // TODO: test app
+                        
+                        // 
                     }
                 }
                 stage('gke per test') {
