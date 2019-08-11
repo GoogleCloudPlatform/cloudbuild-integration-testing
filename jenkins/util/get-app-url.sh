@@ -1,0 +1,1 @@
+echo getting app url
