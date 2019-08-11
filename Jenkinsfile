@@ -165,6 +165,10 @@ pipeline {
                                 test/test-content.sh -r 20 -i 3 -u $(cat /workspace/_app-url) -k 'Chocolate Chip'
                             ''')
                         }
+                        
+                        container('jenkins-gke') { // delete namespace (and all contents)
+                            sh("kubectl delete namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
+                        }
                     }
                 }
                 stage('gke per test') {
