@@ -145,7 +145,7 @@ pipeline {
                                 ''')
                         }
                         container('jenkins-gke') {
-                            sh(''''
+                            sh('''
                                 # get endpoint of deployed app (TODO: make this a reusable method)
                                 # get node port
                                 get_nodeport() {
