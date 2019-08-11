@@ -141,19 +141,19 @@ pipeline {
                         container('gcloud') { // get endpoint
                             sh('''
                                 gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
-                                cat ~/.kube/config
+                                cp ~/.kube/config > /workspace/kubeconfig
 
-                                // # get endpoint of deployed app (TODO: make this a reusable method)
-                                // # get node port
-                                // get_nodeport() {
-                                //     kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
-                                // }
-                                // until [[ -n "$(get_nodeport)" ]]; do
-                                //     echo "querying for nodeport"
-                                //     sleep 3
-                                // done
-                                // echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
-                                // cat /workspace/_nodeport
+                                # get endpoint of deployed app (TODO: make this a reusable method)
+                                # get node port
+                                get_nodeport() {
+                                    kubectl get service cookieshop-web --kubeconfig=/workspace/kubeconfig --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
+                                }
+                                until [[ -n "$(get_nodeport)" ]]; do
+                                    echo "querying for nodeport"
+                                    sleep 3
+                                done
+                                echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
+                                cat /workspace/_nodeport
                             ''')
                         }
                         // TODO: test app
