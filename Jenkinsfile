@@ -154,7 +154,6 @@ pipeline {
                                 echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
                                 cat /workspace/_nodeport
                             ''')
-                            */
                         }
                         // TODO: test app
                         
