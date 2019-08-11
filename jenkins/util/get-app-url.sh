@@ -17,5 +17,5 @@ until [ -n "$(get_nodeip)" ]; do
     sleep 3
 done
 
-echo "http://$(get_nodeip)/$(get_nodeport)" > /workspace/_app-url # save URL for use in next step
+echo "http://$(get_nodeip):$(get_nodeport)" > /workspace/_app-url # save URL for use in next step
 chmod 755 /workspace/_app-url
