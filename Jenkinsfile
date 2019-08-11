@@ -138,6 +138,19 @@ pipeline {
                                 verifyDeployments: false
                                 ])
                             // TODO: get endpoint
+                            sh('''
+                                # get endpoint of deployed app (TODO: make this a reusable method)
+                                # get node port
+                                get_nodeport() {
+                                    kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
+                                }
+                                until [[ -n "$(get_nodeport)" ]]; do
+                                    echo "querying for nodeport"
+                                    sleep 3
+                                done
+                                echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
+                                cat /workspace/_nodeport
+                            ''')
                         }
                         // TODO: test app
                         
