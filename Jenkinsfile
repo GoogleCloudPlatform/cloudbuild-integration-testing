@@ -161,7 +161,7 @@ pipeline {
                                 
                                 # get IP of a node
                                 get_nodeip() {
-                                    kubectl get nodes --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}'
+                                    kubectl get nodes --kubeconfig=/workspace/kubeconfig --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}'
                                 }
                                 until [ -n "$(get_nodeip)" ]; do
                                     echo "querying for nodeip"
