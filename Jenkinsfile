@@ -102,10 +102,12 @@ pipeline {
             steps {
                 container('kustomize') {
                     dir('k8s') {
+                        // TODO: figure out how to move namespace creation inline to kustomize
+                        // (instead of in a discrete step [see further down])
                         sh '''
                             kustomize edit set image __IMAGE-DB__=${GCR_IMAGE_DB}
                             kustomize edit set image __IMAGE-WEB__=${GCR_IMAGE_WEB}
-                            kustomize edit set namespace __NAMESPACE__=${STAGING_NAMESPACE}
+                            kustomize edit set namespace ${STAGING_NAMESPACE}
                             kustomize build . > _kustomized.yaml
                             
                             # debug
@@ -127,18 +129,17 @@ pipeline {
                         }
                     }
                     steps {
-                        // container('jenkins-gke') { // create namespace
-                        //     sh("sed -i 's#__NAMESPACE__#${STAGING_NAMESPACE}#' jenkins/manifests/create-namespace.yaml") //TODO: replace with kustomize?
-                        //     // sh('cat jenkins/manifests/create-namespace.yaml')
-                        //     step([ // TODO: replace this with simple kubectl?
-                        //         $class: 'KubernetesEngineBuilder',
-                        //         projectId: env.PROJECT_ID,
-                        //         clusterName: env.CLUSTER_NAME_STAGING,
-                        //         location: env.LOCATION,
-                        //         manifestPattern: 'jenkins/manifests/create-namespace.yaml',
-                        //         credentialsId: env.CREDENTIALS_ID,
-                        //         verifyDeployments: true])
-                        // }
+                        container('gcloud') { // auth to the cluster
+                            sh('''
+                                gcloud config set container/use_application_default_credentials true
+                                gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
+                                cp ~/.kube/config /workspace/kubeconfig
+                                chmod 755 /workspace/kubeconfig
+                                ''')
+                        }
+                        container('jenkins-gke') { // create namespace
+                            sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
+                        }
                         container('jenkins-gke') { // deploy app
                             unstash 'kustomize'
                             step([
@@ -150,14 +151,6 @@ pipeline {
                                 credentialsId: env.CREDENTIALS_ID,
                                 verifyDeployments: false
                                 ])
-                        }
-                        container('gcloud') { // auth to the cluster
-                            sh('''
-                                gcloud config set container/use_application_default_credentials true
-                                gcloud container clusters get-credentials ${CLUSTER_NAME_STAGING} --zone=${LOCATION}
-                                cp ~/.kube/config /workspace/kubeconfig
-                                chmod 755 /workspace/kubeconfig
-                                ''')
                         }
                         container('jenkins-gke') {
                             // determine URL of the deployed app and store to /workspace/_app-url
