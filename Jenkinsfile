@@ -148,7 +148,7 @@ pipeline {
                         }
                         container('jenkins-gke') {
                             sh('''
-                                # get endpoint of deployed app (TODO: make this a reusable method)
+                                ### get endpoint of deployed app (TODO: make this a reusable method)
                                 # get node port
                                 get_nodeport() {
                                     kubectl get service cookieshop-web --kubeconfig=/workspace/kubeconfig --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
@@ -158,8 +158,19 @@ pipeline {
                                     sleep 3
                                 done
                                 echo "$(get_nodeport)" > /workspace/_nodeport # save port for use in next step
-                                cat /workspace/_nodeport
+                                
+                                # get IP of a node
+                                get_nodeip() {
+                                    kubectl get nodes --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}'
+                                }
+                                until [ -n "$(get_nodeip)" ]; do
+                                    echo "querying for nodeip"
+                                    sleep 3
+                                done
+                                echo "$(get_nodeip)" > /workspace/_nodeipt # save ip for use in next step
                             ''')
+
+                            sh 'jenkins/util/test-script.sh'
                         }
                         // TODO: test app
                         
