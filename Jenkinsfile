@@ -179,10 +179,35 @@ pipeline {
                     }
                     steps {
                         container('jenkins-gke') {
-                            sh('echo dedicated gke')
+                            sh('echo implement me')
                         }
+                    }
+                }
+                stage('microk8s on VM') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'deploy-vm'
+                            yamlFile 'jenkins/podspecs/deploy.yaml'
+                        }
+                    }
+                    steps {
                         container('jenkins-gke') {
-                            sh('echo test dedicated gke')
+                            sh('echo implement me')
+                        }
+                    }
+                }
+                stage('docker compose') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'deploy-compose'
+                            yamlFile 'jenkins/podspecs/deploy.yaml'
+                        }
+                    }
+                    steps {
+                        container('jenkins-gke') {
+                            sh('echo implement me')
                         }
                     }
                 }
