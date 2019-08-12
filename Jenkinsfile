@@ -197,17 +197,18 @@ pipeline {
                     steps {
                         container('gcloud') {
                             sh('''
-                                gcloud auth configure-docker
-                                docker pull ${GCR_IMAGE_WEB}
-                                docker pull ${GCR_IMAGE_DB}
-                                // patch compose file
-                                sed -i 's#__IMAGE-WEB__#${GCR_IMAGE_WEB}#' docker-compose.yml
-                                sed -i 's#__IMAGE-DB__#${GCR_IMAGE_DB}#' docker-compose.yml
+                                # gcloud auth configure-docker
+                                docker pull hello-world
+                                # docker pull ${GCR_IMAGE_WEB}
+                                # docker pull ${GCR_IMAGE_DB}
+                                # patch compose file
+                                # sed -i 's#__IMAGE-WEB__#${GCR_IMAGE_WEB}#' docker-compose.yml
+                                # sed -i 's#__IMAGE-DB__#${GCR_IMAGE_DB}#' docker-compose.yml
                             ''')
                         }
-                        container('docker') {
-                            sh('docker-compose up -d')
-                        }
+                        // container('docker') {
+                        //     sh('docker-compose up -d')
+                        // }
                     }
                 }
             }
