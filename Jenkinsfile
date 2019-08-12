@@ -29,9 +29,9 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
-        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
-        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${BUILD_ID}"
+        BUILD_CONTEXT_WEB = "build-context-web-${BUILD_TAG}.tar.gz"
+        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${GIT_COMMIT}"
+        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${GIT_COMMIT}"
 
         // deploy vars
         CLUSTER_NAME_STAGING = "cookieshop-staging"
