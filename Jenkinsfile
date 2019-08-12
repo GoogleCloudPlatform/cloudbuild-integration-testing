@@ -169,7 +169,7 @@ pipeline {
                         }
                     }
                 }
-                stage('gke per test') {
+                stage('gke per test [unimplemented]') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
@@ -183,7 +183,7 @@ pipeline {
                         }
                     }
                 }
-                stage('microk8s on VM') {
+                stage('microk8s on VM [unimplemented]') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
@@ -197,7 +197,7 @@ pipeline {
                         }
                     }
                 }
-                stage('docker compose') {
+                stage('docker compose [unimplemented]') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
