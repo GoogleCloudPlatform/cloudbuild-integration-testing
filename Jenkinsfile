@@ -195,10 +195,11 @@ pipeline {
                         }
                     }
                     steps {
-                        container('gcloud') {
+                        container('docker') {
                             sh('''
+                                cat /secret/kaniko-secret.json
                                 # gcloud auth configure-docker
-                                docker pull hello-world
+                                # docker pull hello-world
                                 # docker pull ${GCR_IMAGE_WEB}
                                 # docker pull ${GCR_IMAGE_DB}
                                 # patch compose file

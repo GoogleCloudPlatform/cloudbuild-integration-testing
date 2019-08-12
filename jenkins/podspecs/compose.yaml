@@ -15,15 +15,11 @@ spec:
         mountPath: /workspace
       - name: docker-socket-volume
         mountPath: /var/run/docker.sock
+      - name: kaniko-secret
+        mountPath: /secret
     securityContext:
       privileged: true  # not good practice! kaniko is better!
-  - name: gcloud
-    image: google/cloud-sdk:slim
-    command: ['cat']
-    tty: true
-    volumeMounts:
-      - name: workspace
-        mountPath: /workspace
+  restartPolicy: Never
   volumes:
     - name: workspace
       emptyDir: {}
@@ -32,3 +28,6 @@ spec:
       hostPath:
         path: /var/run/docker.sock
         type: File
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
