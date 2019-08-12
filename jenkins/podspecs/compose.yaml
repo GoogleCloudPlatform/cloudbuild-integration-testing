@@ -13,6 +13,15 @@ spec:
     volumeMounts:
       - name: workspace
         mountPath: /workspace
+      - name: docker-socket-volume
+        mountPath: /var/run/docker.sock
+    securityContext:
+      privileged: true  # not good practice!
   volumes:
     - name: workspace
       emptyDir: {}
+      volumes:  
+    - name: docker-socket-volume  
+      hostPath:
+        path: /var/run/docker.sock
+        type: File
