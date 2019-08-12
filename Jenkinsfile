@@ -41,6 +41,7 @@ pipeline {
     }
 
     stages {
+        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -118,8 +119,10 @@ pipeline {
                 }
             }
         }
+        */
         stage('integration tests') {
             parallel {
+                /*
                 stage('gke staging') {
                     agent {
                         kubernetes {
@@ -186,6 +189,7 @@ pipeline {
                         }
                     }
                 }
+                */
                 stage('docker-compose') {
                     agent {
                         kubernetes {
