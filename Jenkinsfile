@@ -186,6 +186,20 @@ pipeline {
                         }
                     }
                 }
+                stage('docker-compose') {
+                    agent {
+                        kubernetes {
+                            cloud 'kubernetes'
+                            label 'docker-compose'
+                            yamlFile 'jenkins/podspecs/compose.yaml'
+                        }
+                    }
+                    steps {
+                        container('docker') {
+                            sh('docker-compose up -d')
+                        }
+                    }
+                }
             }
         }
     }

@@ -31,7 +31,10 @@ services:
     ports:
       - "3306:3306"
       - "33060:33060"
-networks:
-    default:
-        external:
-            name: cloudbuild
+
+# DISABLED; this is necessary for running in cloudbuild, but I'm removing it for the Jenkins build 
+# (for now -- I hope to merge this back to master in a way that will work for both)
+# networks:
+#     default:
+#         external:
+#             name: cloudbuild

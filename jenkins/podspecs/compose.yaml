@@ -1,0 +1,18 @@
+# pod for provisioning and deploying test infra via docker-compose
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compose-pod
+spec:
+  containers:
+  - name: docker
+    image: docker
+    command: ['cat']
+    tty: true
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
+  volumes:
+    - name: workspace
+      emptyDir: {}
