@@ -16,7 +16,14 @@ spec:
       - name: docker-socket-volume
         mountPath: /var/run/docker.sock
     securityContext:
-      privileged: true  # not good practice!
+      privileged: true  # not good practice! kaniko is better!
+  - name: gcloud
+    image: google/cloud-sdk:slim
+    command: ['cat']
+    tty: true
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace
   volumes:
     - name: workspace
       emptyDir: {}
