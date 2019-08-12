@@ -201,11 +201,6 @@ pipeline {
                     steps {
                         container('kompose') {
                             sh('''
-                                # install kompose (TODO: bake this into an image)
-                                curl -L https://github.com/kubernetes/kompose/releases/download/v1.18.0/kompose-linux-amd64 -o kompose 
-                                chmod +x kompose
-                                sudo mv ./kompose /usr/local/bin/kompose
-
                                 kompose version
                                 # auth to GCR 
                                 # chmod 777 /var/run/docker.sock # not supposed to do this but let's try
