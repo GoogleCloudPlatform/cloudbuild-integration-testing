@@ -198,8 +198,7 @@ pipeline {
                         container('docker') {
                             sh('''
                                 // auth to GCR 
-                                docker version
-                                # cat kaniko-secret.json | docker login -u _json_key --password-stdin https://gcr.io
+                                sudo cat kaniko-secret.json | docker login -u _json_key --password-stdin https://gcr.io
                                 # gcloud auth configure-docker
                                 # docker pull hello-world
                                 # docker pull ${GCR_IMAGE_WEB}
