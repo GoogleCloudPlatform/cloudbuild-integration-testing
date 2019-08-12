@@ -91,7 +91,7 @@ pipeline {
                 }
             }
         }
-        stage('write hydrated manifest') {
+        stage('kustomize manifest') {
             agent {
                 kubernetes {
                     cloud 'kubernetes'
@@ -196,6 +196,11 @@ pipeline {
                     }
                     steps {
                         container('docker') {
+                            // patch compose file
+                            sh('''
+                                sed -i 's#__IMAGE-WEB__#${GCR_IMAGE_WEB}#' docker-compose.yml
+                                sed -i 's#__IMAGE-DB__#${GCR_IMAGE_DB}#' docker-compose.yml
+                            ''')
                             sh('docker-compose up -d')
                         }
                     }
