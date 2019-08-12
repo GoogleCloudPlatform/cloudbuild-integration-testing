@@ -169,7 +169,7 @@ pipeline {
                         }
                     }
                 }
-                stage('gke per test') {
+                stage('gke per test [unimplemented]') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'

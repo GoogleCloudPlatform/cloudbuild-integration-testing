@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: docker
-    image: docker/compose
+    image: docker/compose:1.24.1
     command: ['cat']
     tty: true
     volumeMounts:
