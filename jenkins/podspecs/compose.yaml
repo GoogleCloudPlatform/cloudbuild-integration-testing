@@ -6,28 +6,19 @@ metadata:
   name: compose-pod
 spec:
   containers:
-  - name: docker
-    image: docker/compose:1.24.1
+  - name: kompose
+    image: ubuntu # kompose will be installed at run; TODO: pre-bake image
     command: ['cat']
     tty: true
     volumeMounts:
       - name: workspace
         mountPath: /workspace
-      - name: docker-socket-volume
-        mountPath: /var/run/docker.sock
       - name: kaniko-secret
         mountPath: /secret
-    securityContext:
-      privileged: true  # not good practice! kaniko is better!
   restartPolicy: Never
   volumes:
     - name: workspace
       emptyDir: {}
-      volumes:  
-    - name: docker-socket-volume  
-      hostPath:
-        path: /var/run/docker.sock
-        type: File
     - name: kaniko-secret
       secret:
         secretName: kaniko-secret

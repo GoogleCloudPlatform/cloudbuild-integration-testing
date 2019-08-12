@@ -199,11 +199,12 @@ pipeline {
                         }
                     }
                     steps {
-                        container('docker') {
+                        container('kompose') {
                             sh('''
-                                // auth to GCR 
-                                chmod 777 /var/run/docker.sock # not supposed to do this but let's try
-                                docker version
+                                echo hi
+                                # auth to GCR 
+                                # chmod 777 /var/run/docker.sock # not supposed to do this but let's try
+                                # docker version
                                 # sudo cat kaniko-secret.json | docker login -u _json_key --password-stdin https://gcr.io
                                 # gcloud auth configure-docker
                                 # docker pull hello-world
