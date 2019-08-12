@@ -13,8 +13,8 @@ spec:
     volumeMounts:
       - name: workspace
         mountPath: /workspace
-      - name: kaniko-secret
-        mountPath: /secret
+      # - name: kaniko-secret
+      #   mountPath: /secret
   restartPolicy: Never
   volumes:
     - name: workspace
