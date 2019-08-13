@@ -215,8 +215,9 @@ pipeline {
                                 sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                                 kubectl get pods -A
 
-                                # copy images to k3s
-                                # TODO
+                                # copy images to k3s (see https://github.com/rancher/k3s/pull/141)
+                                docker save ${GCR_IMAGE_WEB} > /var/lib/rancher/k3s/agent/images
+                                docker save ${GCR_IMAGE_DB} > /var/lib/rancher/k3s/agent/images
                                 
                                 # deploy app
                                 kubectl create namespace ${UNIQUE_BUILD_ID}
