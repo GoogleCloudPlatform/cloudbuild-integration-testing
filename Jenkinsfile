@@ -204,41 +204,43 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         unstash 'kustomize'
-                        sh('''
-                            # install docker
-                            sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
-                            sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-                            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" -y
-                            sudo apt update -y
-                            sudo apt-cache policy docker-ce
-                            sudo apt install docker-ce
+                        withCredentials([file(credentialsId: 'c-i-testing', variable: 'GC_KEY')]) {
+                            sh('''
+                                # install docker
+                                sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+                                sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+                                sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" -y
+                                sudo apt update -y
+                                sudo apt-cache policy docker-ce
+                                sudo apt install docker-ce
 
-                            # pull images
-                            gcloud auth configure-docker
-                            docker pull ${GCR_IMAGE_WEB}
-                            docker pull ${GCR_IMAGE_DB}
-                            
-                            # install k3s
-                            sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
-                            kubectl get pods -A
-                            
-                            # deploy app
-                            kubectl create namespace ${UNIQUE_BUILD_ID}
-                            kubectl apply -f _kustomized.yaml
+                                # pull images
+                                cat ${GC_KEY} | docker login -u _json_key --password-stdin https://gcr.io
+                                docker pull ${GCR_IMAGE_WEB}
+                                docker pull ${GCR_IMAGE_DB}
+                                
+                                # install k3s
+                                sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
+                                kubectl get pods -A
+                                
+                                # deploy app
+                                kubectl create namespace ${UNIQUE_BUILD_ID}
+                                kubectl apply -f _kustomized.yaml
 
-                            # get ip of deployed app
-                            export APP_IP=$(kubectl get service cookieshop-web -n ${STAGING_NAMESPACE} -o=jsonpath='{.spec.clusterIP}')
+                                # get ip of deployed app
+                                export APP_IP=$(kubectl get service cookieshop-web -n ${STAGING_NAMESPACE} -o=jsonpath='{.spec.clusterIP}')
 
-                            # determine nodeport of deployed app
-                            export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
+                                # determine nodeport of deployed app
+                                export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
 
-                            export APP_URL="http://$APP_IP:$APP_PORT"
+                                export APP_URL="http://$APP_IP:$APP_PORT"
 
-                            # test app
-                            ### -r = retries; -i = interval; -k = keyword to search for ###
-                            test/test-connection.sh -r 20 -i 3 -u $APP_URL
-                            test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
-                        ''')
+                                # test app
+                                ### -r = retries; -i = interval; -k = keyword to search for ###
+                                test/test-connection.sh -r 20 -i 3 -u $APP_URL
+                                test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
+                            ''')
+                        }
                         // 
                         // sh('''
                         //     # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
