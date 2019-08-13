@@ -205,7 +205,7 @@ pipeline {
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-node' } }
                     steps {
-                        unstash 'kustomize'
+                        // unstash 'kustomize'
                         withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
                             sh('''
                                 # install docker
