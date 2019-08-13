@@ -29,15 +29,16 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
-        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
-        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${BUILD_ID}"
+        UNIQUE_BUILD_ID = "${JOB_NAME}-${GIT_COMMIT}"
+        BUILD_CONTEXT_WEB = "build-context-web-${UNIQUE_BUILD_ID}.tar.gz"
+        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${UNIQUE_BUILD_ID}"
+        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${UNIQUE_BUILD_ID}"
 
         // deploy vars
         CLUSTER_NAME_STAGING = "cookieshop-staging"
         LOCATION = "us-central1-a"
         CREDENTIALS_ID = "${JENKINS_TEST_CRED_ID}"
-        STAGING_NAMESPACE = "test-jenkins-${BUILD_ID}"
+        STAGING_NAMESPACE = "test-jenkins-${UNIQUE_BUILD_ID}"
     }
 
     stages {
@@ -187,7 +188,7 @@ pipeline {
                     agent { node { label 'microk8s' } }
                     steps {
                         sh('''
-                            which microk8s
+                            sudo which microk8s
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
 
