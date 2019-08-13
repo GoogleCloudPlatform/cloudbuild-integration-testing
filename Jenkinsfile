@@ -207,6 +207,7 @@ pipeline {
                         sh('''
                             sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                             kubectl get pods -A
+                            kubectl create namespace ${UNIQUE_BUILD_ID}
                             kubectl apply -f _kustomized.yaml
                         ''')
                         // 
