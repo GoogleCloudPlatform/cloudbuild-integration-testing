@@ -206,7 +206,7 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         sh('''
-                            curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -
+                            sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -
                         ''')
                         // unstash 'kustomize'
                         // sh('''
