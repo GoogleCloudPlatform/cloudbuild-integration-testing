@@ -121,6 +121,7 @@ pipeline {
         }
         stage('integration tests') {
             parallel {
+                /*
                 stage('gke staging') {
                     agent {
                         kubernetes {
@@ -184,12 +185,13 @@ pipeline {
                         }
                     }
                 }
+                */
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         sh('''
                             # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
-                            snap install microk8s --classic
+                            sudo snap install microk8s --classic
                             
                             # microk8s.kubectl get pods
                             # deploy application
