@@ -183,10 +183,16 @@ pipeline {
                         }
                     }
                 }
-                stage('microk8s on VM [unimplemented]') {
+                stage('microk8s on VM [WIP]') {
                     agent { node { label 'microk8s' } }
                     steps {
-                        sh('echo implement me')
+                        sh('''
+                            # deploy application
+                            microk8s.kubectl apply -f _kustomized.yaml
+
+                            # debug
+                            microk8s.kubectl get pods
+                        ''')
                     }
                 }
                 stage('docker compose [unimplemented]') {
