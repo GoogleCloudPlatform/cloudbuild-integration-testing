@@ -42,6 +42,7 @@ pipeline {
     }
 
     stages {
+        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -119,6 +120,7 @@ pipeline {
                 }
             }
         }
+        */
         stage('integration tests') {
             parallel {
                 /*
@@ -204,7 +206,7 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         unstash 'kustomize'
-                        withCredentials([file(credentialsId: 'jenkins-gke-secret-file.json', variable: 'GC_KEY')]) {
+                        withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
                             sh('''
                                 # install docker
                                 sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
