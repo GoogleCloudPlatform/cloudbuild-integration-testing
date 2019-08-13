@@ -170,7 +170,7 @@ pipeline {
                         }
                     }
                 }
-                stage('gke per test [unimplemented]') {
+                stage('gke per test [WIP]') {
                     agent {
                         kubernetes {
                             cloud 'kubernetes'
@@ -179,6 +179,10 @@ pipeline {
                         }
                     }
                     steps {
+                        container('gcloud') {
+                            echo "test-$(date +%s)" > _cluster-name
+                            gcloud container clusters create ${STAGING_NAMESPACE}
+                        }
                         container('jenkins-gke') {
                             sh('echo implement me')
                         }
