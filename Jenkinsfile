@@ -205,6 +205,19 @@ pipeline {
                     steps {
                         unstash 'kustomize'
                         sh('''
+                            # install docker
+                            sudo apt install apt-transport-https ca-certificates curl software-properties-common
+                            sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+                            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" -y
+                            sudo apt update -y
+                            sudo apt-cache policy docker-ce
+                            sudo apt install docker-ce
+
+                            # pull images
+                            gcloud auth configure-docker
+                            docker pull ${GCR_IMAGE_WEB}
+                            docker pull ${GCR_IMAGE_DB}
+                            
                             # install k3s
                             sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                             kubectl get pods -A
