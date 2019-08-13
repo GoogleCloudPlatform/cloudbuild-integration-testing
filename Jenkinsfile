@@ -180,8 +180,7 @@ pipeline {
                     }
                     steps {
                         container('gcloud') {
-                            echo "test-$(date +%s)" > _cluster-name
-                            gcloud container clusters create ${STAGING_NAMESPACE}
+                            sh('gcloud container clusters create ${STAGING_NAMESPACE}')
                         }
                         container('jenkins-gke') {
                             sh('echo implement me')
