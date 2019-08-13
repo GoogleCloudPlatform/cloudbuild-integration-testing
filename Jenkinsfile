@@ -198,7 +198,7 @@ pipeline {
                         }
                     }
                 }
-                stage('microk8s on VM [WIP]') {
+                stage('k3s on VM') {
                     agent { node { label 'jenkins-docker' } }
                     steps {
                         unstash 'kustomize'
