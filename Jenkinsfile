@@ -216,8 +216,8 @@ pipeline {
                                 kubectl get pods -A
 
                                 # copy images to k3s (see https://github.com/rancher/k3s/pull/141)
-                                sudo docker save ${GCR_IMAGE_WEB} > /var/lib/rancher/k3s/agent/images
-                                sudo docker save ${GCR_IMAGE_DB} > /var/lib/rancher/k3s/agent/images
+                                sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-web.tar ${GCR_IMAGE_WEB}
+                                sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-db.tar ${GCR_IMAGE_DB}
                                 
                                 # deploy app
                                 kubectl create namespace ${UNIQUE_BUILD_ID}
