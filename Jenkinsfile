@@ -204,7 +204,7 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         unstash 'kustomize'
-                        withCredentials([file(credentialsId: 'c-i-testing', variable: 'GC_KEY')]) {
+                        withCredentials([file(credentialsId: 'jenkins-gke-secret-file.json', variable: 'GC_KEY')]) {
                             sh('''
                                 # install docker
                                 sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
