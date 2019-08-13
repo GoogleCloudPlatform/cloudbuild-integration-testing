@@ -29,15 +29,16 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        BUILD_CONTEXT_WEB = "build-context-web-${BUILD_ID}.tar.gz"
-        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${BUILD_ID}"
-        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${BUILD_ID}"
+        UNIQUE_BUILD_ID = "${BUILD_TAG.toLowerCase()}" // TODO: this can be too long; make a hashing function
+        BUILD_CONTEXT_WEB = "build-context-web-${UNIQUE_BUILD_ID}.tar.gz"
+        GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${UNIQUE_BUILD_ID}"
+        GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${UNIQUE_BUILD_ID}"
 
         // deploy vars
         CLUSTER_NAME_STAGING = "cookieshop-staging"
         LOCATION = "us-central1-a"
         CREDENTIALS_ID = "${JENKINS_TEST_CRED_ID}"
-        STAGING_NAMESPACE = "test-jenkins-${BUILD_ID}"
+        STAGING_NAMESPACE = "${UNIQUE_BUILD_ID}"
     }
 
     stages {
@@ -182,21 +183,7 @@ pipeline {
                             sh('echo implement me')
                         }
                     }
-                }
-                stage('microk8s on VM [unimplemented]') {
-                    agent {
-                        kubernetes {
-                            cloud 'kubernetes'
-                            label 'deploy-vm'
-                            yamlFile 'jenkins/podspecs/deploy.yaml'
-                        }
-                    }
-                    steps {
-                        container('jenkins-gke') {
-                            sh('echo implement me')
-                        }
-                    }
-                }
+                }                
                 stage('docker compose [unimplemented]') {
                     agent {
                         kubernetes {
@@ -208,6 +195,35 @@ pipeline {
                     steps {
                         container('jenkins-gke') {
                             sh('echo implement me')
+                        }
+                    }
+                }
+                stage('microk8s on VM [WIP]') {
+                    agent { node { label 'jenkins-docker' } }
+                    steps {
+                        unstash 'kustomize'
+                        withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
+                            sh('''
+                                # install k3s
+                                sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
+                                
+                                # deploy app
+                                kubectl create namespace ${UNIQUE_BUILD_ID}
+                                kubectl apply -f _kustomized.yaml
+
+                                # get ip of deployed app
+                                export APP_IP=$(kubectl get service cookieshop-web -n ${STAGING_NAMESPACE} -o=jsonpath='{.spec.clusterIP}')
+
+                                # determine nodeport of deployed app
+                                # export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
+
+                                export APP_URL="http://$APP_IP:3000"
+
+                                # test app
+                                ### -r = retries; -i = interval; -k = keyword to search for ###
+                                test/test-connection.sh -r 40 -i 3 -u $APP_URL
+                                test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
+                            ''')
                         }
                     }
                 }
