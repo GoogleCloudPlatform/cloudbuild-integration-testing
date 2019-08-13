@@ -203,6 +203,7 @@ pipeline {
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-node' } }
                     steps {
+                        unstash 'kustomize'
                         sh('''
                             # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
                             sudo snap install microk8s --classic
