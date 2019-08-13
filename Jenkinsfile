@@ -223,7 +223,7 @@ pipeline {
 
                                 # test app
                                 ### -r = retries; -i = interval; -k = keyword to search for ###
-                                test/test-connection.sh -r 20 -i 3 -u $APP_URL
+                                test/test-connection.sh -r 40 -i 3 -u $APP_URL
                                 test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
                             ''')
                         }
