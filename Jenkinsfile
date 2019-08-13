@@ -185,10 +185,11 @@ pipeline {
                     }
                 }
                 stage('microk8s on VM [WIP]') {
-                    agent { node { label 'microk8s' } }
+                    agent { node { label 'jenkins-node' } }
                     steps {
                         sh('''
-                            microk8s.kubectl get pods
+                            sudo echo hi
+                            # microk8s.kubectl get pods
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
 
