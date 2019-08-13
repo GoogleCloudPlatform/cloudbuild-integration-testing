@@ -180,10 +180,39 @@ pipeline {
                     }
                     steps {
                         container('gcloud') {
-                            sh('gcloud container clusters create ${STAGING_NAMESPACE} --zone=us-central1-a')
+                            sh('gcloud container clusters create ${UNIQUE_BUILD_ID} --zone=us-central1-a')
+                            // auth to the cluster
+                            sh('gcloud container clusters get-credentials ${UNIQUE_BUILD_ID} --zone=us-central1-a')
                         }
                         container('jenkins-gke') {
-                            sh('echo implement me')
+
+                            // create namespace 
+                            sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
+                            
+                            // deploy app
+                            step([
+                                $class: 'KubernetesEngineBuilder',
+                                projectId: env.PROJECT_ID,
+                                clusterName: ${UNIQUE_BUILD_ID},
+                                location: 'us-central1-a',
+                                manifestPattern: '_kustomized.yaml',
+                                credentialsId: env.CREDENTIALS_ID,
+                                verifyDeployments: false
+                                ])
+
+                            // determine URL of the deployed app and store to /workspace/_app-url
+                            sh 'jenkins/util/get-app-url.sh'
+                        
+                            // test connectivity to and content of application
+                            sh('''
+                                ### -r = retries; -i = interval; -k = keyword to search for ###
+                                test/test-connection.sh -r 20 -i 3 -u $(cat /workspace/_app-url)
+                                test/test-content.sh -r 20 -i 3 -u $(cat /workspace/_app-url) -k 'Chocolate Chip'
+                            ''')
+                        }
+                        container('gcloud') {
+                            // delete the cluster
+                            sh('gcloud container clusters delete ${UNIQUE_BUILD_ID} --zone=us-central1-a')
                         }
                     }
                 }                
