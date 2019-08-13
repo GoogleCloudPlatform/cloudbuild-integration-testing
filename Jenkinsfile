@@ -215,7 +215,7 @@ pipeline {
 
                             # determine nodeport of deployed app
                             get_nodeport() {
-                                kubectl get service cookieshop-web --kubeconfig=/workspace/kubeconfig --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
+                                kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
                             }
 
                             until [ -n "$(get_nodeport)" ]; do
