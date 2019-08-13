@@ -29,7 +29,7 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        UNIQUE_BUILD_ID = "${BUILD_TAG}"
+        UNIQUE_BUILD_ID = "${BUILD_TAG}" // TODO: this can be too long; make a hashing function
         BUILD_CONTEXT_WEB = "build-context-web-${UNIQUE_BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${UNIQUE_BUILD_ID}"
         GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${UNIQUE_BUILD_ID}"
@@ -188,9 +188,7 @@ pipeline {
                     agent { node { label 'microk8s' } }
                     steps {
                         sh('''
-                            which microk8s
-                            microk8s version
-                            kubectl.microk8s get pods
+                            microk8s.kubectl get pods
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
 
