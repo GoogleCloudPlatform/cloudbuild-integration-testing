@@ -203,19 +203,11 @@ pipeline {
                 }
                 */
                 stage('microk8s on VM [WIP]') {
-                    agent { node { label 'jenkins-node' } }
+                    agent { node { label 'jenkins-docker' } }
                     steps {
-                        // unstash 'kustomize'
+                        //  unstash 'kustomize'
                         withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
                             sh('''
-                                # install docker
-                                sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
-                                sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-                                sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" -y
-                                sudo apt update -y
-                                sudo apt-cache policy docker-ce
-                                sudo apt install docker-ce
-
                                 # pull images
                                 cat ${GC_KEY} | docker login -u _json_key --password-stdin https://gcr.io
                                 docker pull ${GCR_IMAGE_WEB}
@@ -224,6 +216,9 @@ pipeline {
                                 # install k3s
                                 sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                                 kubectl get pods -A
+
+                                # copy images to k3s
+                                # TODO
                                 
                                 # deploy app
                                 kubectl create namespace ${UNIQUE_BUILD_ID}
