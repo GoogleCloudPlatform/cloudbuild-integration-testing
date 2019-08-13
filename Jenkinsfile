@@ -29,7 +29,7 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        UNIQUE_BUILD_ID = "${BUILD_TAG.toLowerCase()}" // TODO: this can be too long; make a hashing function
+        UNIQUE_BUILD_ID = "${BUILD_TAG.toLowerCase().reverse().take(40).reverse()}" // k8s clusters are max 40 chars
         BUILD_CONTEXT_WEB = "build-context-web-${UNIQUE_BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${UNIQUE_BUILD_ID}"
         GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${UNIQUE_BUILD_ID}"
