@@ -220,7 +220,9 @@ pipeline {
                                 sudo chmod 777 /var/lib/rancher/k3s/agent/images/
                                 sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-web.tar ${GCR_IMAGE_WEB}
                                 sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-db.tar ${GCR_IMAGE_DB}
-                                sudo ls /var/lib/rancher/k3s/agent/images/
+                                sudo chmod 777 /var/lib/rancher/k3s/agent/images/cookieshop-web.tar
+                                sudo chmod 777 /var/lib/rancher/k3s/agent/images/cookieshop-db.tar 
+                                sudo ls -l /var/lib/rancher/k3s/agent/images/
                                 
                                 # deploy app
                                 kubectl create namespace ${UNIQUE_BUILD_ID}
