@@ -188,7 +188,9 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         sh('''
-                            sudo echo hi
+                            # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
+                            snap install microk8s --classic
+                            
                             # microk8s.kubectl get pods
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
