@@ -188,7 +188,9 @@ pipeline {
                     agent { node { label 'microk8s' } }
                     steps {
                         sh('''
-                            sudo which microk8s
+                            which microk8s
+                            microk8s version
+                            kubectl.microk8s get pods
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
 
