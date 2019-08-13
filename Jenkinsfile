@@ -213,17 +213,13 @@ pipeline {
                             kubectl create namespace ${UNIQUE_BUILD_ID}
                             kubectl apply -f _kustomized.yaml
 
+                            # get ip of deployed app
+                            export APP_IP=$(kubectl get service cookieshop-web -n ${STAGING_NAMESPACE} -o=jsonpath='{.spec.clusterIP}')
+
                             # determine nodeport of deployed app
-                            get_nodeport() {
-                                kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
-                            }
+                            export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
 
-                            until [ -n "$(get_nodeport)" ]; do
-                                echo "querying for nodeport"
-                                sleep 3
-                            done
-
-                            export APP_URL="http://127.0.0.1:$(get_nodeport)"
+                            export APP_URL="http://$APP_IP:$APP_PORT"
 
                             # test app
                             ### -r = retries; -i = interval; -k = keyword to search for ###
