@@ -42,7 +42,6 @@ pipeline {
     }
 
     stages {
-        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -120,7 +119,6 @@ pipeline {
                 }
             }
         }
-        */
         stage('integration tests') {
             parallel {
                 /*
@@ -216,13 +214,12 @@ pipeline {
                             sudo microk8s.status --wait-ready
                             sudo microk8s.enable dns
                             sudo microk8s.status --wait-ready
-                            sudo microk8s.kubectl get pods
                             
                             # deploy application
-                            # microk8s.kubectl apply -f _kustomized.yaml
+                            sudo microk8s.kubectl apply -f _kustomized.yaml
 
                             # debug
-                            # microk8s.kubectl get pods
+                            sudo microk8s.kubectl get pods
                         ''')
                     }
                 }
