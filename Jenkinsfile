@@ -121,7 +121,6 @@ pipeline {
         }
         stage('integration tests') {
             parallel {
-                /*
                 stage('gke staging') {
                     agent {
                         kubernetes {
@@ -199,7 +198,6 @@ pipeline {
                         }
                     }
                 }
-                */
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-docker' } }
                     steps {
@@ -227,23 +225,6 @@ pipeline {
                                 test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
                             ''')
                         }
-                        // 
-                        // sh('''
-                        //     # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
-                        //     sudo snap install microk8s --classic
-
-                        //     # Patch microk8s configuration so we can connect from the outside
-                        //     # This is not a good practice, use it only for the purpose of this lab
-                        //     sudo sed -i.sed-bak "s/127.0.0.1/0.0.0.0/" /var/snap/microk8s/current/args/kube-apiserver
-                        //     sudo systemctl restart snap.microk8s.daemon-apiserver.service
-                        //     sudo microk8s.enable dns
-
-                        //     # deploy application
-                        //     sudo microk8s.kubectl apply -f _kustomized.yaml
-
-                        //     # debug
-                        //     sudo microk8s.kubectl get pods
-                        // ''')
                     }
                 }
             }
