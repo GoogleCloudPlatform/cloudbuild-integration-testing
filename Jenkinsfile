@@ -184,24 +184,7 @@ pipeline {
                             sh('echo implement me')
                         }
                     }
-                }
-                */
-                stage('microk8s on VM [WIP]') {
-                    agent { node { label 'jenkins-node' } }
-                    steps {
-                        sh('''
-                            # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
-                            sudo snap install microk8s --classic
-                            
-                            # microk8s.kubectl get pods
-                            # deploy application
-                            # microk8s.kubectl apply -f _kustomized.yaml
-
-                            # debug
-                            # microk8s.kubectl get pods
-                        ''')
-                    }
-                }
+                }                
                 stage('docker compose [unimplemented]') {
                     agent {
                         kubernetes {
@@ -214,6 +197,31 @@ pipeline {
                         container('jenkins-gke') {
                             sh('echo implement me')
                         }
+                    }
+                }
+                */
+                stage('microk8s on VM [WIP]') {
+                    agent { node { label 'jenkins-node' } }
+                    steps {
+                        sh('''
+                            # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
+                            sudo snap install microk8s --classic
+                            
+                            # Patch microk8s configuration so we can connect from the outside
+                            # This is not a good practice, use it only for the purpose of this lab
+                            sudo sed -i.sed-bak "s/127\.0\.0\.1/0.0.0.0/" /var/snap/microk8s/current/args/kube-apiserver
+                            sudo systemctl restart snap.microk8s.daemon-apiserver.service
+                            microk8s.status --wait-ready
+                            microk8s.enable dns
+                            microk8s.status --wait-ready
+                            microk8s.kubectl get pods
+                            
+                            # deploy application
+                            # microk8s.kubectl apply -f _kustomized.yaml
+
+                            # debug
+                            # microk8s.kubectl get pods
+                        ''')
                     }
                 }
             }
