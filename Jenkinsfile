@@ -38,7 +38,7 @@ pipeline {
         CLUSTER_NAME_STAGING = "cookieshop-staging"
         LOCATION = "us-central1-a"
         CREDENTIALS_ID = "${JENKINS_TEST_CRED_ID}"
-        STAGING_NAMESPACE = "test-${UNIQUE_BUILD_ID}"
+        STAGING_NAMESPACE = "${UNIQUE_BUILD_ID}"
     }
 
     stages {
