@@ -42,7 +42,6 @@ pipeline {
     }
 
     stages {
-        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -120,7 +119,6 @@ pipeline {
                 }
             }
         }
-        */
         stage('integration tests') {
             parallel {
                 /*
@@ -205,7 +203,7 @@ pipeline {
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-docker' } }
                     steps {
-                        //  unstash 'kustomize'
+                        unstash 'kustomize'
                         withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
                             sh('''
                                 # pull images
