@@ -187,11 +187,12 @@ pipeline {
                     agent { node { label 'microk8s' } }
                     steps {
                         sh('''
+                            which microk8s
                             # deploy application
-                            microk8s.kubectl apply -f _kustomized.yaml
+                            # microk8s.kubectl apply -f _kustomized.yaml
 
                             # debug
-                            microk8s.kubectl get pods
+                            # microk8s.kubectl get pods
                         ''')
                     }
                 }
