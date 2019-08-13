@@ -187,7 +187,7 @@ pipeline {
                         container('jenkins-gke') {
 
                             // create namespace 
-                            sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
+                            sh("kubectl create namespace ${STAGING_NAMESPACE}")
                             
                             // deploy app
                             step([
