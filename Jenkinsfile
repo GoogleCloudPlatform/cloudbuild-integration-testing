@@ -213,9 +213,13 @@ pipeline {
                             kubectl create namespace ${UNIQUE_BUILD_ID}
                             kubectl apply -f _kustomized.yaml
 
-                            # determine nodeport of deployed app
+                            ### get endpoint of deployed app 
+
                             get_nodeport() {
                                 kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
+                            }
+                            get_nodeip() {
+                                kubectl get nodes --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}'
                             }
 
                             until [ -n "$(get_nodeport)" ]; do
@@ -223,7 +227,12 @@ pipeline {
                                 sleep 3
                             done
 
-                            export APP_URL="http://localhost:$(get_nodeport)"
+                            until [ -n "$(get_nodeip)" ]; do
+                                echo "querying for nodeip"
+                                sleep 3
+                            done
+
+                            export APP_URL="http://$(get_nodeip):$(get_nodeport)"
 
                             # test app
                             ### -r = retries; -i = interval; -k = keyword to search for ###
