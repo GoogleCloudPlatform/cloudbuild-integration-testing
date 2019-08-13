@@ -205,10 +205,30 @@ pipeline {
                     steps {
                         unstash 'kustomize'
                         sh('''
+                            # install k3s
                             sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                             kubectl get pods -A
+                            
+                            # deploy app
                             kubectl create namespace ${UNIQUE_BUILD_ID}
                             kubectl apply -f _kustomized.yaml
+
+                            # determine nodeport of deployed app
+                            get_nodeport() {
+                                kubectl get service cookieshop-web --kubeconfig=/workspace/kubeconfig --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}' 
+                            }
+
+                            until [ -n "$(get_nodeport)" ]; do
+                                echo "querying for nodeport"
+                                sleep 3
+                            done
+
+                            export APP_URL="http://localhost:$(get_nodeport)"
+
+                            # test app
+                            ### -r = retries; -i = interval; -k = keyword to search for ###
+                            test/test-connection.sh -r 20 -i 3 -u $APP_URL
+                            test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
                         ''')
                         // 
                         // sh('''
