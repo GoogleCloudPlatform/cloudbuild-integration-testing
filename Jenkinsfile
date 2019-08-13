@@ -206,23 +206,8 @@ pipeline {
                         unstash 'kustomize'
                         withCredentials([file(credentialsId: 'gcp-secret-file', variable: 'GC_KEY')]) {
                             sh('''
-                                # pull images
-                                cat ${GC_KEY} | docker login -u _json_key --password-stdin https://gcr.io
-                                docker pull ${GCR_IMAGE_WEB}
-                                docker pull ${GCR_IMAGE_DB}
-                                
                                 # install k3s
                                 sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
-                                kubectl get pods -A
-
-                                # copy images to k3s (see https://github.com/rancher/k3s/pull/141)
-                                sudo mkdir -p /var/lib/rancher/k3s/agent/images/
-                                sudo chmod 777 /var/lib/rancher/k3s/agent/images/
-                                sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-web.tar ${GCR_IMAGE_WEB}
-                                sudo docker save -o /var/lib/rancher/k3s/agent/images/cookieshop-db.tar ${GCR_IMAGE_DB}
-                                sudo chmod 777 /var/lib/rancher/k3s/agent/images/cookieshop-web.tar
-                                sudo chmod 777 /var/lib/rancher/k3s/agent/images/cookieshop-db.tar 
-                                sudo ls -l /var/lib/rancher/k3s/agent/images/
                                 
                                 # deploy app
                                 kubectl create namespace ${UNIQUE_BUILD_ID}
@@ -232,9 +217,9 @@ pipeline {
                                 export APP_IP=$(kubectl get service cookieshop-web -n ${STAGING_NAMESPACE} -o=jsonpath='{.spec.clusterIP}')
 
                                 # determine nodeport of deployed app
-                                export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
+                                # export APP_PORT=$(kubectl get service cookieshop-web --namespace=${STAGING_NAMESPACE} -o=jsonpath='{.spec.ports[0].nodePort}')
 
-                                export APP_URL="http://$APP_IP:$APP_PORT"
+                                export APP_URL="http://$APP_IP:3000"
 
                                 # test app
                                 ### -r = retries; -i = interval; -k = keyword to search for ###
