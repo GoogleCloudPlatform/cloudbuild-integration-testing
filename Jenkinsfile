@@ -42,7 +42,6 @@ pipeline {
     }
 
     stages {
-        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -120,7 +119,6 @@ pipeline {
                 }
             }
         }
-        */
         stage('integration tests') {
             parallel {
                 /*
@@ -205,11 +203,13 @@ pipeline {
                 stage('microk8s on VM [WIP]') {
                     agent { node { label 'jenkins-node' } }
                     steps {
+                        unstash 'kustomize'
                         sh('''
                             sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                             kubectl get pods -A
+                            kubectl apply -f _kustomized.yaml
                         ''')
-                        // unstash 'kustomize'
+                        // 
                         // sh('''
                         //     # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
                         //     sudo snap install microk8s --classic
