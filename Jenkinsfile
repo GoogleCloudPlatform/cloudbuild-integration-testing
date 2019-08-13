@@ -42,6 +42,7 @@ pipeline {
     }
 
     stages {
+        /*
         stage('build and push containers'){
             parallel {
                 stage('web') {
@@ -119,6 +120,7 @@ pipeline {
                 }
             }
         }
+        */
         stage('integration tests') {
             parallel {
                 /*
@@ -211,10 +213,10 @@ pipeline {
                             # This is not a good practice, use it only for the purpose of this lab
                             sudo sed -i.sed-bak "s/127.0.0.1/0.0.0.0/" /var/snap/microk8s/current/args/kube-apiserver
                             sudo systemctl restart snap.microk8s.daemon-apiserver.service
-                            microk8s.status --wait-ready
-                            microk8s.enable dns
-                            microk8s.status --wait-ready
-                            microk8s.kubectl get pods
+                            sudo microk8s.status --wait-ready
+                            sudo microk8s.enable dns
+                            sudo microk8s.status --wait-ready
+                            sudo microk8s.kubectl get pods
                             
                             # deploy application
                             # microk8s.kubectl apply -f _kustomized.yaml
