@@ -180,7 +180,7 @@ pipeline {
                     }
                     steps {
                         container('gcloud') {
-                            sh('gcloud container clusters create ${STAGING_NAMESPACE} --zone=us-us-central1-a')
+                            sh('gcloud container clusters create ${STAGING_NAMESPACE} --zone=us-central1-a')
                         }
                         container('jenkins-gke') {
                             sh('echo implement me')
