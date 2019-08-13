@@ -206,8 +206,7 @@ pipeline {
                     agent { node { label 'jenkins-node' } }
                     steps {
                         sh('''
-                            sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -
-                            sudo chmod 755 ~/.kube/k3s.yaml
+                            sudo curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v0.8.0 sh -s - --write-kubeconfig-mode=755
                             kubectl get pods -A
                         ''')
                         // unstash 'kustomize'
