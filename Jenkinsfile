@@ -29,7 +29,7 @@ pipeline {
         PROJECT_ID = "${PROJECT}"
 
         // build vars
-        UNIQUE_BUILD_ID = "${JOB_NAME}-${GIT_COMMIT}"
+        UNIQUE_BUILD_ID = "foo-${GIT_COMMIT}"
         BUILD_CONTEXT_WEB = "build-context-web-${UNIQUE_BUILD_ID}.tar.gz"
         GCR_IMAGE_WEB = "gcr.io/${PROJECT}/cookieshop-web:${UNIQUE_BUILD_ID}"
         GCR_IMAGE_DB = "gcr.io/${PROJECT}/cookieshop-db:${UNIQUE_BUILD_ID}"
