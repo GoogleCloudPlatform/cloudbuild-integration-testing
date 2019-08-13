@@ -206,14 +206,12 @@ pipeline {
                         sh('''
                             # install microk8s (TODO: pre-install this and bake image [I tried and failed at this -dave])
                             sudo snap install microk8s --classic
-                            
+                            sudo microk8s.enable dns
+
                             # Patch microk8s configuration so we can connect from the outside
                             # This is not a good practice, use it only for the purpose of this lab
                             sudo sed -i.sed-bak "s/127.0.0.1/0.0.0.0/" /var/snap/microk8s/current/args/kube-apiserver
                             sudo systemctl restart snap.microk8s.daemon-apiserver.service
-                            sudo microk8s.status --wait-ready
-                            sudo microk8s.enable dns
-                            sudo microk8s.status --wait-ready
                             
                             # deploy application
                             sudo microk8s.kubectl apply -f _kustomized.yaml
