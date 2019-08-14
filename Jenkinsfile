@@ -187,7 +187,19 @@ pipeline {
                 stage('docker compose [unimplemented]') {
                     agent { node { label 'jenkins-docker' } }
                     steps {
-                        docker-compose up -d
+                        sh('''
+                            // patch docker-compose file
+                            sed -i.sed-bak "s#__IMAGE-DB__#${GCR_IMAGE_DB}#" docker-compose.yml
+                            sed -i.sed-bak "s#__IMAGE-WEB__#${GCR_IMAGE_WEB}#" docker-compose.yml                            
+                            docker-compose up -d
+                            
+                            // test connectivity and content
+                            APP_URL=http://localhost:3000
+                            
+                            ### -r = retries; -i = interval; -k = keyword to search for ###
+                            test/test-connection.sh -r 20 -i 3 -u $APP_URL
+                            test/test-content.sh -r 20 -i 3 -u $APP_URL -k 'Chocolate Chip'
+                        ''')
                     }
                 }
                 stage('microk8s on VM [WIP]') {
