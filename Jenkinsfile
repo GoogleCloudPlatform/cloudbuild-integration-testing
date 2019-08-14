@@ -189,9 +189,10 @@ pipeline {
                     steps {
                         sh('''
                             // patch docker-compose file
-                            sed -i.sed-bak "s#__IMAGE-DB__#${GCR_IMAGE_DB}#" docker-compose.yml
-                            sed -i.sed-bak "s#__IMAGE-WEB__#${GCR_IMAGE_WEB}#" docker-compose.yml                            
-                            docker-compose up -d
+                            cp docker-compose.yml ~
+                            sed -i.sed-bak "s#__IMAGE-DB__#${GCR_IMAGE_DB}#" ~/docker-compose.yml
+                            sed -i.sed-bak "s#__IMAGE-WEB__#${GCR_IMAGE_WEB}#" ~/docker-compose.yml                            
+                            docker-compose up -d -f ~/docker-compose.yml
                             
                             // test connectivity and content
                             APP_URL=http://localhost:3000
