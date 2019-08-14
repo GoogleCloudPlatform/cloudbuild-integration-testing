@@ -15,7 +15,7 @@
 version: '2'
 services:
   web:
-    image: web
+    image: __IMAGE-WEB__
     container_name: web
     ports: 
       - "3000:3000"
@@ -24,14 +24,10 @@ services:
     depends_on:
       - database
   database:
-    image: mysql
+    image: __IMAGE-DB__
     container_name: database
     environment:
         MYSQL_ROOT_PASSWORD: "password"
     ports:
       - "3306:3306"
       - "33060:33060"
-networks:
-    default:
-        external:
-            name: cloudbuild
