@@ -184,8 +184,8 @@ pipeline {
                             
                             sh('''
                                 // auth to the cluster
-                                gcloud config set container/use_application_default_credentials true
-                                gcloud container clusters get-credentials ${UNIQUE_BUILD_ID} --zone=us-central1-a')
+                                # gcloud config set container/use_application_default_credentials true
+                                # gcloud container clusters get-credentials ${UNIQUE_BUILD_ID} --zone=us-central1-a
                                 
                                 // save kubeconfig for later kubectl commands
                                 cp ~/.kube/config /workspace/kubeconfig
