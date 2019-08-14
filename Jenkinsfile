@@ -181,16 +181,19 @@ pipeline {
                     steps {
                         container('gcloud') {
                             sh('gcloud container clusters create ${UNIQUE_BUILD_ID} --zone=us-central1-a')
-                            // auth to the cluster
-                            sh('gcloud container clusters get-credentials ${UNIQUE_BUILD_ID} --zone=us-central1-a')
-                            // save kubeconfig for later kubectl commands
+                            
                             sh('''
+                                // auth to the cluster
+                                gcloud config set container/use_application_default_credentials true
+                                gcloud container clusters get-credentials ${UNIQUE_BUILD_ID} --zone=us-central1-a')
+                                
+                                // save kubeconfig for later kubectl commands
                                 cp ~/.kube/config /workspace/kubeconfig
                                 chmod 755 /workspace/kubeconfig
                             ''')
                         }
                         container('jenkins-gke') {
-
+                            unstash 'kustomize'
                             // create namespace 
                             sh("kubectl create namespace ${STAGING_NAMESPACE} --kubeconfig=/workspace/kubeconfig")
                             
