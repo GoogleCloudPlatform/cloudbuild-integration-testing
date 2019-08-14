@@ -185,17 +185,9 @@ pipeline {
                     }
                 }                
                 stage('docker compose [unimplemented]') {
-                    agent {
-                        kubernetes {
-                            cloud 'kubernetes'
-                            label 'deploy-compose'
-                            yamlFile 'jenkins/podspecs/deploy.yaml'
-                        }
-                    }
+                    agent { node { label 'jenkins-docker' } }
                     steps {
-                        container('jenkins-gke') {
-                            sh('echo implement me')
-                        }
+                        docker-compose up -d
                     }
                 }
                 stage('microk8s on VM [WIP]') {
