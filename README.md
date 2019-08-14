@@ -1,4 +1,4 @@
-# Integration Testing on GCB
+# Integration Testing on GCB at WSO2
 This is a demo showing how to execute multi-container integration tests as part of a [Google Cloud Build](https://cloud.google.com/cloud-build/) invocation.
 
 Download the latest stable release of this demo [here](https://github.com/GoogleCloudPlatform/cloudbuild-integration-testing/releases).
