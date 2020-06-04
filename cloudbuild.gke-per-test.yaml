@@ -142,7 +142,6 @@ options:
   env:
     # location/name of GKE cluster (used by all kubectl commands)
     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
-    - CLOUDSDK_CONTAINER_CLUSTER=staging
 
 timeout:
   3600s
